@@ -24,6 +24,18 @@ const SummaryTables: React.FC<SummaryTablesProps> = ({ rasedSummary, teacherMapp
 
   const closeModal = () => setSelectedDetails(null);
 
+  const getPercentageColorClass = (val: number) => {
+    if (val < 75) return 'color-low';
+    if (val < 95) return 'color-mid';
+    return 'color-high';
+  };
+
+  const getPercentageBgClass = (val: number) => {
+    if (val < 75) return 'bg-low';
+    if (val < 95) return 'bg-mid';
+    return 'bg-high';
+  };
+
   return (
     <div className="space-y-10 relative">
       {selectedDetails && (
@@ -42,7 +54,7 @@ const SummaryTables: React.FC<SummaryTablesProps> = ({ rasedSummary, teacherMapp
               <div className="grid grid-cols-3 gap-4">
                 <StatBox label="تم الرصد" val={selectedDetails.data.rasidCount} color="emerald" />
                 <StatBox label="لم يرصد" val={selectedDetails.data.lamRasidCount} color="rose" />
-                <StatBox label="النسبة" val={`${selectedDetails.data.percentage}%`} color="blue" />
+                <StatBox label="النسبة" val={`${selectedDetails.data.percentage}%`} colorClass={getPercentageColorClass(selectedDetails.data.percentage)} />
               </div>
               <div className="border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
                 <table className="w-full text-right border-collapse">
@@ -77,37 +89,37 @@ const SummaryTables: React.FC<SummaryTablesProps> = ({ rasedSummary, teacherMapp
       )}
 
       {Object.entries(rasedSummary).map(([saf, fasels]) => (
-        <div key={saf} className="space-y-6 print-page-break">
+        <div key={saf} className="space-y-6">
           {Object.entries(fasels).map(([fasel, periodsData]) => {
             const targetPeriods = period === 'both' ? ['أولى', 'ثانية'] : [period];
             const hasData = targetPeriods.some(p => periodsData[p] && Object.keys(periodsData[p]).length > 0);
             if (!hasData) return null;
 
             return (
-              <div key={`${saf}-${fasel}`} className="space-y-5 print-avoid-break">
-                <div className="bg-white border-2 border-slate-200 p-6 rounded-2xl shadow-sm text-center print:border-black print-card">
+              <div key={`${saf}-${fasel}`} className="space-y-4 print:page-break-before-always">
+                <div className="bg-white border border-slate-200 p-6 rounded-[1.5rem] shadow-sm text-center print:border-black print-card print:p-4 print:mb-2">
                   <h3 className="text-xl font-black text-slate-900 print:text-2xl">إحصائيات رصد الفصل: {saf} - {fasel}</h3>
-                  <p className="text-blue-700 text-[11px] font-black uppercase mt-1 print:text-black">{periodLabel}</p>
+                  <p className="text-blue-700 text-[10px] font-black uppercase mt-1 print:text-black">{periodLabel}</p>
                 </div>
 
-                <div className={`grid gap-6 ${period === 'both' ? 'grid-cols-1 xl:grid-cols-2 print:grid-cols-2' : 'grid-cols-1'}`}>
+                <div className={`grid gap-4 ${period === 'both' ? 'grid-cols-1 lg:grid-cols-2 print:grid-cols-2' : 'grid-cols-1'}`}>
                   {targetPeriods.map(p => {
                     const subjects = periodsData[p];
                     if (!subjects) return null;
 
                     return (
-                      <div key={p} className="bg-white rounded-2xl shadow-sm border-2 border-slate-200 overflow-hidden print:border-black print-card">
-                        <div className={`py-3 px-6 text-white font-black text-xs flex justify-between items-center print:bg-black ${p === 'أولى' ? 'bg-blue-800' : 'bg-indigo-900'}`}>
+                      <div key={p} className="bg-white rounded-[1.5rem] shadow-sm border border-slate-200 overflow-hidden print:border-black print-card">
+                        <div className={`py-2 px-6 text-white font-black text-xs flex justify-between items-center print:bg-black ${p === 'أولى' ? 'bg-blue-800' : 'bg-indigo-900'}`}>
                           <span>إحصائية الفترة {p}</span>
-                          <span className="bg-white/10 px-3 py-1 rounded-lg text-[10px]">المواد: {Object.keys(subjects).length}</span>
+                          <span className="bg-white/10 px-3 py-1 rounded-lg text-[9px]">المواد: {Object.keys(subjects).length}</span>
                         </div>
                         <div className="overflow-x-auto">
                           <table className="w-full text-right border-collapse print-compact-table">
                             <thead>
-                              <tr className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase">
-                                <th className="px-5 py-4">المادة الدراسية</th>
-                                {hasTeachers && <th className="px-5 py-4">اسم المعلم</th>}
-                                <th className="px-5 py-4 text-center">الإنجاز</th>
+                              <tr className="bg-slate-50 text-[9px] font-black text-slate-400 uppercase">
+                                <th className="px-5 py-3">المادة الدراسية</th>
+                                {hasTeachers && <th className="px-5 py-3">اسم المعلم</th>}
+                                <th className="px-5 py-3 text-center w-24">الإنجاز</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -116,20 +128,20 @@ const SummaryTables: React.FC<SummaryTablesProps> = ({ rasedSummary, teacherMapp
                                 const teachers = teacherMapping[saf]?.[fasel]?.[subj] || ["---"];
                                 return (
                                   <tr key={idx} className="border-b border-slate-100 hover:bg-blue-50/20 print:border-black">
-                                    <td className="px-5 py-4">
+                                    <td className="px-5 py-3">
                                       <button 
                                         onClick={() => setSelectedDetails({ saf, fasel, period: p, subject: subj, teachers, data })} 
-                                        className="font-black text-slate-900 text-[12px] md:text-sm text-right hover:text-blue-700 print:text-black"
+                                        className="font-black text-slate-900 text-[11px] md:text-sm text-right hover:text-blue-700 print:text-black"
                                       >
                                         {subj}
                                       </button>
                                     </td>
-                                    {hasTeachers && <td className="px-5 py-4 text-slate-500 text-[11px] font-bold print:text-black">{teachers.join('، ')}</td>}
-                                    <td className="px-5 py-4">
+                                    {hasTeachers && <td className="px-5 py-3 text-slate-500 text-[10px] font-bold print:text-black">{teachers.join('، ')}</td>}
+                                    <td className="px-5 py-3">
                                       <div className="flex flex-col items-center">
-                                        <span className={`text-[11px] font-black ${data.percentage === 100 ? 'text-emerald-700' : 'text-slate-900'} print:text-black`}>{data.percentage}%</span>
-                                        <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden no-print">
-                                          <div className={`h-full rounded-full ${data.percentage === 100 ? 'bg-emerald-600' : 'bg-blue-700'}`} style={{ width: `${data.percentage}%` }}></div>
+                                        <span className={`text-[11px] font-black ${getPercentageColorClass(data.percentage)}`}>{data.percentage}%</span>
+                                        <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden no-print mt-1">
+                                          <div className={`h-full rounded-full ${getPercentageBgClass(data.percentage)}`} style={{ width: `${data.percentage}%` }}></div>
                                         </div>
                                       </div>
                                     </td>
@@ -152,8 +164,8 @@ const SummaryTables: React.FC<SummaryTablesProps> = ({ rasedSummary, teacherMapp
   );
 };
 
-const StatBox = ({ label, val, color }: any) => (
-  <div className={`p-4 rounded-2xl text-center border shadow-sm ${color === 'emerald' ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : color === 'rose' ? 'bg-rose-50 border-rose-100 text-rose-700' : 'bg-blue-50 border-blue-100 text-blue-700'}`}>
+const StatBox = ({ label, val, color, colorClass }: any) => (
+  <div className={`p-4 rounded-2xl text-center border shadow-sm ${color === 'emerald' ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : color === 'rose' ? 'bg-rose-50 border-rose-100 text-rose-700' : 'bg-blue-50 border-blue-100'} ${colorClass || ''}`}>
     <span className="block text-[10px] font-black uppercase opacity-60 mb-1">{label}</span>
     <span className="text-xl font-black">{val}</span>
   </div>

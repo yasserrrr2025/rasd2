@@ -22,7 +22,7 @@
       @media print {
         @page {
           size: A4 portrait;
-          margin: 8mm 8mm;
+          margin: 10mm 10mm;
         }
         .no-print { display: none !important; }
         body { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
@@ -31,30 +31,37 @@
         .print-avoid-break { page-break-inside: avoid; break-inside: avoid; }
 
         .print-card { 
-          border: 1.5pt solid #000 !important; 
+          border: 1.2pt solid #000 !important; 
           border-radius: 8px !important;
           margin-bottom: 15px !important;
+          page-break-inside: avoid;
         }
 
         .print-compact-table thead { display: table-header-group !important; }
         .print-compact-table th { 
-          background-color: #e2e8f0 !important; 
+          background-color: #f1f5f9 !important; 
           color: black !important;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
           border: 1pt solid #000 !important;
           font-size: 8pt !important;
+          padding: 4px !important;
         }
         .print-compact-table td { 
           border: 0.8pt solid #000 !important;
           font-size: 8pt !important;
           color: black !important;
+          padding: 3px !important;
         }
         
         /* ألوان صريحة للطباعة */
-        .print-green { color: #15803d !important; font-weight: 900 !important; }
-        .print-red { color: #b91c1c !important; font-weight: 900 !important; }
-        .print-blue { color: #1e40af !important; font-weight: 900 !important; }
+        .color-low { color: #b91c1c !important; font-weight: 900 !important; -webkit-print-color-adjust: exact; }
+        .color-mid { color: #1e40af !important; font-weight: 900 !important; -webkit-print-color-adjust: exact; }
+        .color-high { color: #15803d !important; font-weight: 900 !important; -webkit-print-color-adjust: exact; }
+        
+        .bg-low { background-color: #b91c1c !important; -webkit-print-color-adjust: exact; }
+        .bg-mid { background-color: #1e40af !important; -webkit-print-color-adjust: exact; }
+        .bg-high { background-color: #15803d !important; -webkit-print-color-adjust: exact; }
       }
     </style>
   <script type="importmap">

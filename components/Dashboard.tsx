@@ -46,45 +46,66 @@ const Dashboard: React.FC<DashboardProps> = ({ rasedSummary, teacherMapping, per
   }, [rasedSummary, teacherMapping, period]);
 
   const percentageNum = Number(stats.percentage);
-  const statusColor = percentageNum === 100 ? 'text-emerald-600' : percentageNum > 80 ? 'text-blue-600' : 'text-rose-600';
+  
+  const getPercentageColorClass = (val: number) => {
+    if (val < 75) return 'color-low';
+    if (val < 95) return 'color-mid';
+    return 'color-high';
+  };
+
+  const getPercentageBgClass = (val: number) => {
+    if (val < 75) return 'bg-low';
+    if (val < 95) return 'bg-mid';
+    return 'bg-high';
+  };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
+    <div className="space-y-6 animate-in fade-in duration-700">
       
-      <div className="print-avoid-break">
-        <div className="bg-white rounded-[2.5rem] p-10 md:p-14 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center relative overflow-hidden print:border-black print-card">
-          <div className="relative z-10 text-center md:text-right space-y-6">
+      {/* القسم الأول: نظرة عامة وإنجاز المدرسة - مصغر للطباعة */}
+      <div className="print:block print:page-break-after-avoid">
+        <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center relative overflow-hidden print:border-black print-card print:p-6 print:mb-4">
+          <div className="relative z-10 text-center md:text-right space-y-4">
             <div>
-              <span className="inline-flex items-center gap-2 bg-blue-700 text-white px-5 py-2 rounded-full text-[11px] font-black uppercase tracking-wider mb-4 shadow-lg print:bg-black print:text-white">
+              <span className="inline-flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider mb-2 print:bg-black print:text-white">
                 تقرير الحالة الراهنة للمدرسة
               </span>
-              <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight print:text-black">إنجاز رصد المدرسة</h2>
-              <p className="text-slate-500 font-bold text-lg mt-2 print:text-black">{period === 'both' ? 'إجمالي الفترتين الدراسيتين' : `الفترة الدراسيـة: ${period}`}</p>
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight print:text-black print:text-2xl">إنجاز رصد المدرسة</h2>
+              <p className="text-slate-500 font-bold text-base mt-1 print:text-black print:text-sm">{period === 'both' ? 'إجمالي الفترتين الدراسيتين' : `الفترة الدراسيـة: ${period}`}</p>
             </div>
             
             <button 
               onClick={() => window.print()} 
-              className="no-print bg-blue-700 text-white px-10 py-4 rounded-2xl font-black text-sm hover:bg-blue-800 transition-all flex items-center gap-4 mx-auto md:mr-0 shadow-xl"
+              className="no-print bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-xs hover:bg-blue-800 transition-all flex items-center gap-4 mx-auto md:mr-0 shadow-lg"
             >
               ⎙ طباعة التقارير المعتمدة
             </button>
           </div>
 
-          <div className="relative z-10 mt-12 md:mt-0 text-center flex flex-col items-center">
+          <div className="relative z-10 mt-8 md:mt-0 text-center flex flex-col items-center">
             <div className="relative inline-flex items-center justify-center">
-              <svg className="w-48 h-48 md:w-56 md:h-56 transform -rotate-90">
-                <circle cx="50%" cy="50%" r="45%" stroke="currentColor" strokeWidth="14" fill="transparent" className="text-slate-100" />
-                <circle cx="50%" cy="50%" r="45%" stroke="currentColor" strokeWidth="14" fill="transparent" strokeDasharray="283" strokeDashoffset={283 - (283 * percentageNum) / 100} className={`${percentageNum === 100 ? 'text-emerald-600' : 'text-blue-700'} transition-all duration-1000 ease-out print:text-black`} strokeLinecap="round" />
+              <svg className="w-40 h-40 md:w-48 md:h-48 transform -rotate-90">
+                <circle cx="50%" cy="50%" r="45%" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-slate-100" />
+                <circle 
+                  cx="50%" cy="50%" r="45%" 
+                  stroke="currentColor" 
+                  strokeWidth="12" 
+                  fill="transparent" 
+                  strokeDasharray="283" 
+                  strokeDashoffset={283 - (283 * percentageNum) / 100} 
+                  className={`${getPercentageColorClass(percentageNum)} transition-all duration-1000 ease-out`} 
+                  strokeLinecap="round" 
+                />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className={`text-5xl md:text-6xl font-black ${statusColor} print:text-black`}>{stats.percentage}%</span>
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 print:text-black">نسبة الإنجاز</span>
+                <span className={`text-4xl md:text-5xl font-black ${getPercentageColorClass(percentageNum)}`}>{stats.percentage}%</span>
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5 print:text-black">نسبة الإنجاز</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-4 print:gap-2">
           <StatCard title="إجمالي الطلاب" value={stats.studentCount} color="blue" icon="👥" />
           <StatCard title="عدد المواد" value={stats.subjectCount} color="emerald" icon="📚" />
           <StatCard title="عدد الفصول" value={stats.classesCount} color="amber" icon="🏫" />
@@ -92,26 +113,27 @@ const Dashboard: React.FC<DashboardProps> = ({ rasedSummary, teacherMapping, per
         </div>
       </div>
 
-      <div className="bg-white p-10 rounded-[2.5rem] border border-slate-200 shadow-sm print:border-black print-card">
-        <div className="flex justify-between items-center mb-10 border-b-2 pb-5 print:border-black">
-          <h3 className="text-xl font-black text-slate-950 flex items-center gap-3 print:text-2xl">
-            <span className="p-2.5 bg-emerald-50 rounded-xl text-emerald-600 no-print">🏆</span>
-            ترتيب الفصول المكتملة
+      {/* القسم الثاني: ترتيب الفصول - يفضل أن يكون في نفس الصفحة للطباعة إذا أمكن */}
+      <div className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm print:border-black print-card print:p-6 print:mt-4 print:page-break-after-always">
+        <div className="flex justify-between items-center mb-6 border-b-2 pb-3 print:border-black">
+          <h3 className="text-lg font-black text-slate-950 flex items-center gap-3 print:text-xl">
+            <span className="p-2 bg-emerald-50 rounded-xl text-emerald-600 no-print">🏆</span>
+            ترتيب إنجاز الفصول
           </h3>
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter print:text-black">بناءً على دقة الرصد</span>
+          <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter print:text-black">بناءً على دقة الرصد</span>
         </div>
-        <div className="space-y-7">
-          {stats.classesList.slice(0, 10).map((cls, idx) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 print:grid-cols-2 print:gap-x-8 print:gap-y-2">
+          {stats.classesList.map((cls, idx) => (
             <div key={idx} className="group">
-              <div className="flex justify-between items-center mb-3 px-1">
-                <div className="flex items-center gap-5">
-                  <span className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black bg-slate-50 text-slate-400 border border-slate-200 group-hover:bg-blue-700 group-hover:text-white transition-all print:bg-black print:text-white">{idx + 1}</span>
-                  <span className="font-bold text-slate-800 print:text-black print:font-black">{cls.name}</span>
+              <div className="flex justify-between items-center mb-1.5 px-1">
+                <div className="flex items-center gap-3">
+                  <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black bg-slate-50 text-slate-400 border border-slate-200 print:bg-black print:text-white`}>{idx + 1}</span>
+                  <span className="font-bold text-slate-800 text-sm print:text-black print:font-black">{cls.name}</span>
                 </div>
-                <span className={`text-xs font-black ${cls.percentage === 100 ? 'text-emerald-700' : 'text-blue-700'} print:text-black`}>{cls.percentage}%</span>
+                <span className={`text-[11px] font-black ${getPercentageColorClass(cls.percentage)}`}>{cls.percentage}%</span>
               </div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-50 print:bg-slate-200">
-                <div className={`h-full transition-all duration-1000 ${cls.percentage === 100 ? 'bg-emerald-600' : 'bg-blue-600'} print:bg-black`} style={{ width: `${cls.percentage}%` }}></div>
+              <div className="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-50 print:bg-slate-200">
+                <div className={`h-full transition-all duration-1000 ${getPercentageBgClass(cls.percentage)}`} style={{ width: `${cls.percentage}%` }}></div>
               </div>
             </div>
           ))}
@@ -130,13 +152,13 @@ const StatCard = ({ title, value, color, icon }: any) => {
   };
   
   return (
-    <div className="bg-white p-7 rounded-[2rem] border border-slate-200 shadow-sm flex items-center gap-6 transition-all hover:border-blue-300 print:border-black print-card">
-      <div className={`p-4 rounded-2xl ${themes[color]} border print:bg-transparent print:border-none print:p-0`}>
-        <div className="w-8 h-8 flex items-center justify-center text-2xl print:text-3xl">{icon}</div>
+    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 transition-all hover:border-blue-300 print:border-black print-card print:p-3">
+      <div className={`p-3 rounded-xl ${themes[color]} border print:bg-transparent print:border-none print:p-0`}>
+        <div className="w-6 h-6 flex items-center justify-center text-xl print:text-2xl">{icon}</div>
       </div>
       <div>
-        <span className="block text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1 print:text-black">{title}</span>
-        <span className="text-2xl font-black text-slate-900 print:text-black">{value}</span>
+        <span className="block text-slate-400 text-[9px] font-black uppercase tracking-widest mb-0.5 print:text-black">{title}</span>
+        <span className="text-xl font-black text-slate-900 print:text-black print:text-lg">{value}</span>
       </div>
     </div>
   );
