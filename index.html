@@ -9,17 +9,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
     <style>
       :root {
-        --primary-blue: #2563eb;
-        --deep-slate: #0f172a;
+        --primary-blue: #1e40af;
+        --success-green: #15803d;
+        --danger-red: #b91c1c;
       }
       body {
         font-family: 'Cairo', sans-serif;
-        background-color: #f1f5f9;
+        background-color: #f8fafc;
         scroll-behavior: smooth;
         -webkit-font-smoothing: antialiased;
-      }
-      * {
-        transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
       }
       @media print {
         @page {
@@ -29,84 +27,34 @@
         .no-print { display: none !important; }
         body { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
         
-        .print-page-break {
-          page-break-before: always;
-          break-before: page;
-        }
-
-        .print-avoid-break {
-          page-break-inside: avoid;
-          break-inside: avoid;
-        }
+        .print-page-break { page-break-before: always; break-before: page; }
+        .print-avoid-break { page-break-inside: avoid; break-inside: avoid; }
 
         .print-card { 
-          border: 1.2pt solid #000 !important; 
-          box-shadow: none !important; 
-          background: white !important; 
-          border-radius: 6px !important;
-          margin-bottom: 12px !important;
-          overflow: hidden !important;
+          border: 1.5pt solid #000 !important; 
+          border-radius: 8px !important;
+          margin-bottom: 15px !important;
         }
 
-        .print-compact-table {
-          width: 100% !important;
-          table-layout: auto !important; /* السماح بالاحتواء التلقائي */
-          border-collapse: collapse !important;
-        }
-
-        /* تكرار رأس الجدول في كل صفحة */
-        .print-compact-table thead {
-          display: table-header-group !important;
-        }
-
+        .print-compact-table thead { display: table-header-group !important; }
         .print-compact-table th { 
-          background-color: #f8fafc !important;
+          background-color: #e2e8f0 !important; 
           color: black !important;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
-          font-weight: 900 !important;
           border: 1pt solid #000 !important;
           font-size: 8pt !important;
-          padding: 4px !important;
         }
-
         .print-compact-table td { 
-          padding: 3px 5px !important; 
-          font-size: 8pt !important;
           border: 0.8pt solid #000 !important;
-          color: #000 !important;
-          font-weight: 700 !important;
-          vertical-align: middle !important;
-        }
-
-        /* عمود الاسم: حجم خط صغير واحتواء تلقائي */
-        .print-col-name {
-          font-size: 7.5pt !important;
-          white-space: normal !important;
-          line-height: 1.1 !important;
-          min-width: 130px !important;
-          max-width: 160px !important;
-        }
-
-        /* أعمدة الأرقام والمؤشرات */
-        .print-col-min {
-          width: 1% !important;
-          white-space: nowrap !important;
-          text-align: center !important;
+          font-size: 8pt !important;
+          color: black !important;
         }
         
-        .print-report-text {
-          font-size: 8pt !important;
-        }
-
-        .print-bg-dark {
-          background-color: #000 !important;
-          color: white !important;
-          -webkit-print-color-adjust: exact;
-        }
-      }
-      .custom-shadow {
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        /* ألوان صريحة للطباعة */
+        .print-green { color: #15803d !important; font-weight: 900 !important; }
+        .print-red { color: #b91c1c !important; font-weight: 900 !important; }
+        .print-blue { color: #1e40af !important; font-weight: 900 !important; }
       }
     </style>
   <script type="importmap">
