@@ -19,7 +19,7 @@
         -webkit-font-smoothing: antialiased;
       }
 
-      /* فئات الألوان العامة - تظهر في الشاشة */
+      /* فئات الألوان العامة */
       .color-low { color: #b91c1c !important; }
       .color-mid { color: #1e40af !important; }
       .color-high { color: #15803d !important; }
@@ -28,7 +28,6 @@
       .bg-mid { background-color: #3b82f6 !important; } 
       .bg-high { background-color: #10b981 !important; } 
 
-      /* تحسين مظهر شريط التقدم */
       .progress-container {
         height: 12px;
         background-color: #e2e8f0;
@@ -44,18 +43,24 @@
         .no-print { display: none !important; }
         body { background: white !important; padding: 0 !important; margin: 0 !important; }
         
-        /* التحكم في ترتيب الصفحات */
-        .print-page-1 { page-break-after: always !important; }
-        .print-page-2 { page-break-after: always !important; }
-        .print-page-3 { page-break-after: always !important; }
-        .print-new-page { page-break-before: always !important; }
+        /* الترتيب المطلوب للصفحات */
+        .print-page-dashboard { page-break-after: always !important; }
+        .print-page-teachers { page-break-after: always !important; }
+        .print-page-ranking { page-break-after: always !important; }
+        .print-page-class-stats { page-break-before: always !important; page-break-inside: avoid !important; }
+
+        /* ضمان عدم انفصال العنوان عن الجدول */
+        .keep-together {
+          page-break-inside: avoid !important;
+          break-inside: avoid !important;
+          display: block;
+        }
 
         .print-card { 
           border: 1.5pt solid #000 !important; 
           border-radius: 10px !important;
           margin-bottom: 20px !important;
           padding: 15px !important;
-          page-break-inside: avoid;
         }
 
         .print-compact-table { 
@@ -74,19 +79,9 @@
           font-size: 9pt !important;
         }
         
-        /* إجبار ظهور الألوان في الطباعة */
-        .bg-low { background-color: #b91c1c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .bg-mid { background-color: #1e40af !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .bg-high { background-color: #15803d !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        
-        .color-low { color: #b91c1c !important; -webkit-print-color-adjust: exact; }
-        .color-mid { color: #1e40af !important; -webkit-print-color-adjust: exact; }
-        .color-high { color: #15803d !important; -webkit-print-color-adjust: exact; }
-
-        .progress-bar-print {
-          height: 14px !important;
-          border: 0.5pt solid #000 !important;
-        }
+        .bg-low { background-color: #b91c1c !important; -webkit-print-color-adjust: exact; }
+        .bg-mid { background-color: #1e40af !important; -webkit-print-color-adjust: exact; }
+        .bg-high { background-color: #15803d !important; -webkit-print-color-adjust: exact; }
       }
     </style>
   <script type="importmap">
