@@ -4,38 +4,58 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>نظام متابعة رصد المواد</title>
+    <title>نظام متابعة رصد المواد للمرحلة الثانوية</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
     <style>
+      :root {
+        --primary-blue: #2563eb;
+        --deep-slate: #0f172a;
+      }
       body {
         font-family: 'Cairo', sans-serif;
-        background-color: #f8fafc;
+        background-color: #f1f5f9;
+        scroll-behavior: smooth;
+        -webkit-font-smoothing: antialiased;
+      }
+      /* Smooth transitions for all interactive elements */
+      * {
+        transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
       }
       @media print {
         .no-print { display: none !important; }
         body { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
         .print-card { 
-          border: 1px solid #e2e8f0 !important; 
+          border: 1px solid #94a3b8 !important; 
           box-shadow: none !important; 
           background: white !important; 
-          margin-bottom: 8px !important;
-          border-radius: 4px !important;
+          margin-bottom: 12px !important;
+          border-radius: 8px !important;
           break-inside: avoid;
         }
         .print-compact-table td, .print-compact-table th { 
-          padding: 3px 5px !important; 
-          font-size: 8.5pt !important;
-          border: 0.5pt solid #cbd5e1 !important;
-          line-height: 1.2 !important;
+          padding: 4px 6px !important; 
+          font-size: 9pt !important;
+          border: 1px solid #cbd5e1 !important;
+          color: black !important;
         }
-        .print-text-small { font-size: 7.5pt !important; }
-        h1, h2, h3 { color: black !important; margin: 5px 0 !important; }
-        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        .print-header { border-bottom: 2px solid black !important; padding-bottom: 10px !important; margin-bottom: 20px !important; }
       }
-      .glass-card {
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(226, 232, 240, 0.8);
+      .custom-shadow {
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      }
+      .tab-active {
+        position: relative;
+      }
+      .tab-active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 20%;
+        right: 20%;
+        height: 3px;
+        background: var(--primary-blue);
+        border-radius: 10px;
       }
     </style>
   <script type="importmap">
@@ -54,7 +74,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="text-slate-900">
+  <body class="text-slate-950">
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>

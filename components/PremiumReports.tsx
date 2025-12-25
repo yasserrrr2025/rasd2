@@ -80,7 +80,8 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
         });
 
         Object.entries(studentStats).forEach(([name, stat]) => {
-          if (stat.count >= 3) {
+          // تم التعديل ليشمل مادة واحدة فأكثر
+          if (stat.count >= 1) {
             students.push({
               name,
               saf,
@@ -105,7 +106,6 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
         ['أولى', 'ثانية'].forEach(p => {
           const pData = rasedSummary[saf][fasel][p];
           if (!pData) return;
-          // Fix: Explicitly cast the data object in Object.entries to SubjectData
           Object.entries(pData).forEach(([sub, rawData]) => {
             const data = rawData as SubjectData;
             summaryRows.push({
@@ -204,7 +204,7 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
           <div className="flex justify-between items-center mb-10">
             <h3 className="text-2xl font-black flex items-center gap-4 text-slate-950 dark:text-white">
               <span className="bg-amber-100 dark:bg-amber-900/40 p-3 rounded-2xl text-2xl shadow-inner text-amber-700 border border-amber-200">🔍</span>
-              طلاب متبقي لهم رصد (3 مواد فأكثر)
+              طلاب متبقي لهم رصد (مادة فأكثر)
             </h3>
             <span className="bg-amber-700 text-white px-5 py-2 rounded-2xl text-xs font-black shadow-xl">
               {lostStudents.length} طلاب
