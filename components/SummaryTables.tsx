@@ -88,9 +88,9 @@ const SummaryTables: React.FC<SummaryTablesProps> = ({ rasedSummary, teacherMapp
 
             return (
               <div key={`${saf}-${fasel}`} className="space-y-4 print-avoid-break">
-                <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm text-center print:p-2 print:border-blue-600 print-card">
-                  <h3 className="text-lg font-black text-slate-900 print:text-sm">إحصائيات {saf} - {fasel}</h3>
-                  <p className="text-blue-600 text-[10px] font-black uppercase mt-1 print:mt-0">{periodLabel}</p>
+                <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm text-center print:p-4 print:border-black print-card">
+                  <h3 className="text-lg font-black text-slate-900 print:text-xl print-text-bold">إحصائيات رصد: {saf} - {fasel}</h3>
+                  <p className="text-blue-600 text-[10px] font-black uppercase mt-1 print:mt-1 print:text-[11pt] print:text-black">{periodLabel}</p>
                 </div>
 
                 <div className={`grid gap-5 ${period === 'both' ? 'grid-cols-1 xl:grid-cols-2 print:grid-cols-2' : 'grid-cols-1'}`}>
@@ -99,18 +99,18 @@ const SummaryTables: React.FC<SummaryTablesProps> = ({ rasedSummary, teacherMapp
                     if (!subjects) return null;
 
                     return (
-                      <div key={p} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden print-card">
-                        <div className={`py-2.5 px-5 text-white font-black text-[11px] flex justify-between items-center print:py-1 print:px-3 print:text-[8px] ${p === 'أولى' ? 'bg-blue-600' : 'bg-purple-600'}`}>
-                          <span>الفترة {p}</span>
-                          <span className="bg-white/20 px-2 py-0.5 rounded-lg text-[9px] print:text-[7px]">المواد: {Object.keys(subjects).length}</span>
+                      <div key={p} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden print-card print:border-black">
+                        <div className={`py-2.5 px-5 text-white font-black text-[11px] flex justify-between items-center print:py-2 print:px-4 print:text-[10pt] print:bg-black print:text-white ${p === 'أولى' ? 'bg-blue-600' : 'bg-purple-600'}`}>
+                          <span>إحصائية الفترة {p}</span>
+                          <span className="bg-white/20 px-2 py-0.5 rounded-lg text-[9px] print:text-[9pt] print:bg-white/10">عدد المواد: {Object.keys(subjects).length}</span>
                         </div>
                         <div className="overflow-x-auto">
                           <table className="w-full text-right border-collapse print-compact-table">
                             <thead>
-                              <tr className="bg-slate-50 text-[9px] font-black text-slate-400 uppercase print:text-[7px]">
-                                <th className="px-4 py-3 print:py-1">المادة</th>
-                                {hasTeachers && <th className="px-4 py-3 print:py-1">المعلم</th>}
-                                <th className="px-4 py-3 text-center print:py-1">الإنجاز</th>
+                              <tr className="bg-slate-50 text-[9px] font-black text-slate-400 uppercase print:text-[10pt] print:text-black">
+                                <th className="px-4 py-3 print:py-2 print-text-bold">المادة الدراسية</th>
+                                {hasTeachers && <th className="px-4 py-3 print:py-2 print-text-bold">اسم المعلم</th>}
+                                <th className="px-4 py-3 text-center print:py-2 print-text-bold">نسبة الإنجاز</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -118,19 +118,19 @@ const SummaryTables: React.FC<SummaryTablesProps> = ({ rasedSummary, teacherMapp
                                 const data = rawData as SubjectData;
                                 const teachers = teacherMapping[saf]?.[fasel]?.[subj] || ["---"];
                                 return (
-                                  <tr key={idx} className="border-b border-slate-50 hover:bg-blue-50/20 print:border-slate-200">
-                                    <td className="px-4 py-3 print:py-1 print:px-2">
+                                  <tr key={idx} className="border-b border-slate-50 hover:bg-blue-50/20 print:border-black">
+                                    <td className="px-4 py-3 print:py-3 print:px-4">
                                       <button 
                                         onClick={() => setSelectedDetails({ saf, fasel, period: p, subject: subj, teachers, data })} 
-                                        className="font-bold text-slate-800 text-[11px] text-right hover:text-blue-600 print:text-[8px] print:cursor-default"
+                                        className="font-bold text-slate-800 text-[11px] text-right hover:text-blue-600 print:text-[11pt] print:text-black print:font-black print:cursor-default"
                                       >
                                         {subj}
                                       </button>
                                     </td>
-                                    {hasTeachers && <td className="px-4 py-3 text-slate-500 text-[9px] font-bold print:py-1 print:px-2 print:text-[7px]">{teachers.join('، ')}</td>}
-                                    <td className="px-4 py-3 print:py-1 print:px-2">
+                                    {hasTeachers && <td className="px-4 py-3 text-slate-500 text-[9px] font-bold print:py-3 print:px-4 print:text-[10pt] print:text-black">{teachers.join('، ')}</td>}
+                                    <td className="px-4 py-3 print:py-3 print:px-4">
                                       <div className="flex flex-col items-center gap-1 print:gap-0">
-                                        <span className={`text-[9px] font-black print:text-[7px] ${data.percentage === 100 ? 'text-emerald-600' : 'text-slate-600'}`}>{data.percentage}%</span>
+                                        <span className={`text-[9px] font-black print:text-[11pt] print-text-bold ${data.percentage === 100 ? 'text-emerald-600 print:text-black' : 'text-slate-600 print:text-black'}`}>{data.percentage}%</span>
                                         <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden no-print">
                                           <div className={`h-full rounded-full ${data.percentage === 100 ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${data.percentage}%` }}></div>
                                         </div>
