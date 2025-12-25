@@ -40,51 +40,63 @@
         }
 
         .print-card { 
-          border: 1.5pt solid #000 !important; 
+          border: 1.2pt solid #000 !important; 
           box-shadow: none !important; 
           background: white !important; 
-          border-radius: 8px !important;
-          margin-bottom: 15px !important;
+          border-radius: 6px !important;
+          margin-bottom: 12px !important;
           overflow: hidden !important;
         }
 
         .print-compact-table {
           width: 100% !important;
-          table-layout: fixed !important; /* فرض توزيع الأعمدة */
+          table-layout: auto !important; /* السماح بالاحتواء التلقائي */
           border-collapse: collapse !important;
         }
 
+        /* تكرار رأس الجدول في كل صفحة */
+        .print-compact-table thead {
+          display: table-header-group !important;
+        }
+
         .print-compact-table th { 
-          background-color: #f1f5f9 !important;
+          background-color: #f8fafc !important;
           color: black !important;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
           font-weight: 900 !important;
           border: 1pt solid #000 !important;
-          font-size: 7.5pt !important; /* تقليل حجم الخط الافتراضي للجداول */
-          padding: 3px !important;
+          font-size: 8pt !important;
+          padding: 4px !important;
         }
 
         .print-compact-table td { 
-          padding: 2px 4px !important; 
-          font-size: 7pt !important; /* الخط المطلوب 8pt أو أصغر قليلاً للكشوف المزدحمة */
+          padding: 3px 5px !important; 
+          font-size: 8pt !important;
           border: 0.8pt solid #000 !important;
           color: #000 !important;
           font-weight: 700 !important;
-          word-wrap: break-word !important;
+          vertical-align: middle !important;
         }
 
-        /* تنسيق خاص لعمود الاسم لضمان احتواء الأعمدة */
-        .print-name-col {
-          width: 140px !important;
-          font-size: 7pt !important;
-          white-space: normal !important; /* السماح بالالتفاف إذا لزم الأمر */
+        /* عمود الاسم: حجم خط صغير واحتواء تلقائي */
+        .print-col-name {
+          font-size: 7.5pt !important;
+          white-space: normal !important;
           line-height: 1.1 !important;
-          text-align: right !important;
+          min-width: 130px !important;
+          max-width: 160px !important;
+        }
+
+        /* أعمدة الأرقام والمؤشرات */
+        .print-col-min {
+          width: 1% !important;
+          white-space: nowrap !important;
+          text-align: center !important;
         }
         
         .print-report-text {
-          font-size: 8pt !important; /* الخط المطلوب للتقارير */
+          font-size: 8pt !important;
         }
 
         .print-bg-dark {
@@ -92,8 +104,6 @@
           color: white !important;
           -webkit-print-color-adjust: exact;
         }
-
-        .print-text-black { color: #000 !important; font-weight: 900 !important; }
       }
       .custom-shadow {
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);

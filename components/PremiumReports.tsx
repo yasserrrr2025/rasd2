@@ -121,12 +121,13 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
         </button>
       </div>
 
-      <section className="bg-white rounded-[2.5rem] shadow-sm border-2 border-slate-300 overflow-hidden print:border-black print-card print-avoid-break">
-        <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4 print:bg-slate-100 print:text-black print:p-4 print:border-b-2 print:border-black">
+      {/* تقرير المعلمين */}
+      <section className="bg-white rounded-[2.5rem] shadow-sm border-2 border-slate-300 overflow-hidden print:border-black print-card print:mb-8">
+        <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4 print:bg-slate-50 print:text-black print:p-4 print:border-b-2 print:border-black">
           <div className="flex items-center gap-5">
             <span className="text-4xl bg-white/10 p-4 rounded-3xl no-print">👨‍🏫</span>
             <div>
-              <h3 className="text-2xl md:text-3xl font-black print:text-base">كشف المعلمين المتبقي لديهم رصد</h3>
+              <h3 className="text-2xl md:text-3xl font-black print:text-[11pt]">كشف المعلمين المتبقي لديهم رصد</h3>
               <p className="text-slate-300 text-sm font-bold mt-1 print:text-[8pt] print:text-black">{periodLabel}</p>
             </div>
           </div>
@@ -145,17 +146,17 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
           <div className="overflow-x-auto print:overflow-visible">
             <table className="w-full text-right border-collapse print-compact-table">
               <thead>
-                <tr className="bg-slate-100 text-slate-900 font-black print:bg-slate-50 print:text-black">
-                  <th className="px-8 py-6 print:py-2 print:text-[8pt] print:border-black">اسم المعلم</th>
-                  <th className="px-8 py-6 print:py-2 print:text-[8pt] print:border-black">المواد والفصول</th>
-                  <th className="px-8 py-6 text-center print:py-2 print:text-[8pt] print:border-black">عدد الطلاب</th>
-                  <th className="px-8 py-6 text-center print:py-2 print:text-[8pt] print:border-black">النسبة</th>
+                <tr className="bg-slate-100 text-slate-900 font-black">
+                  <th className="px-8 py-6 print:py-2 print:text-[8pt] print-col-name">اسم المعلم</th>
+                  <th className="px-8 py-6 print:py-2 print:text-[8pt]">المواد والفصول</th>
+                  <th className="px-8 py-6 text-center print:py-2 print:text-[8pt] print-col-min">الطلاب</th>
+                  <th className="px-8 py-6 text-center print:py-2 print:text-[8pt] print-col-min">النسبة</th>
                 </tr>
               </thead>
               <tbody>
                 {teacherDefaulters.map((t, i) => (
                   <tr key={i} className="border-b border-slate-200 hover:bg-slate-50/50 print:border-black">
-                    <td className="px-8 py-6 font-black text-slate-950 text-xl print:py-1 print:text-[8pt] print:text-black">{t.name}</td>
+                    <td className="px-8 py-6 font-black text-slate-950 text-xl print:py-1 print:text-[8pt] print-col-name">{t.name}</td>
                     <td className="px-8 py-6 print:py-1">
                       <div className="flex flex-wrap gap-2 print:gap-1">
                         {t.details.map((d, di) => (
@@ -163,8 +164,8 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
                         ))}
                       </div>
                     </td>
-                    <td className="px-8 py-6 text-center text-slate-900 font-black text-2xl print:py-1 print:text-[9pt] print:text-black">{t.lam}</td>
-                    <td className="px-8 py-6 text-center text-slate-900 font-black text-xl print:py-1 print:text-[8pt] print:text-black">{t.percentage}%</td>
+                    <td className="px-8 py-6 text-center text-slate-900 font-black text-2xl print:py-1 print:text-[9pt] print-col-min">{t.lam}</td>
+                    <td className="px-8 py-6 text-center text-slate-900 font-black text-xl print:py-1 print:text-[8pt] print-col-min">{t.percentage}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -173,6 +174,7 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
         )}
       </section>
 
+      {/* تقرير الطلاب المتبقين */}
       <section className="space-y-8 print:space-y-4">
         <div className="bg-blue-900 p-8 rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-6 no-print shadow-xl">
           <div className="flex items-center gap-6">
@@ -207,19 +209,19 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
             <div className="overflow-x-auto print:overflow-visible">
               <table className="w-full text-right border-collapse print-compact-table">
                 <thead>
-                  <tr className="bg-slate-100 text-slate-900 font-black print:bg-slate-50 print:text-black">
-                    <th className="px-6 py-5 w-16 text-center print:py-2 print:text-[8pt] print:border-black">م</th>
-                    <th className="px-6 py-5 print:py-2 print:text-[8pt] print:border-black">الاسم</th>
-                    <th className="px-6 py-5 text-center print:py-2 print:text-[8pt] print:border-black">المواد</th>
-                    <th className="px-6 py-5 print:py-2 print:text-[8pt] print:border-black">التفاصيل</th>
+                  <tr className="bg-slate-100 text-slate-900 font-black">
+                    <th className="px-6 py-5 print:py-2 print:text-[8pt] print-col-min">م</th>
+                    <th className="px-6 py-5 print:py-2 print:text-[8pt] print-col-name">اسم الطالب الرباعي</th>
+                    <th className="px-6 py-5 print:py-2 print:text-[8pt] print-col-min">المواد</th>
+                    <th className="px-6 py-5 print:py-2 print:text-[8pt]">تفاصيل المواد المتبقية</th>
                   </tr>
                 </thead>
                 <tbody>
                   {students.map((s, si) => (
                     <tr key={si} className="border-b border-slate-200 hover:bg-slate-50 transition-colors print:border-black">
-                      <td className="px-6 py-5 text-center font-black text-slate-400 print:py-1 print:text-[8pt] print:text-black">{si + 1}</td>
-                      <td className="px-6 py-5 font-black text-slate-950 text-lg print:py-1 print:text-[8pt] print:text-black">{s.name}</td>
-                      <td className="px-6 py-5 text-center text-slate-900 font-black text-2xl print:py-1 print:text-[9pt] print:text-black">{s.missingCount}</td>
+                      <td className="px-6 py-5 text-center font-black text-slate-400 print:py-1 print:text-[8pt] print:text-black print-col-min">{si + 1}</td>
+                      <td className="px-6 py-5 font-black text-slate-950 text-lg print:py-1 print:text-[7.5pt] print:text-black print-col-name">{s.name}</td>
+                      <td className="px-6 py-5 text-center text-slate-900 font-black text-2xl print:py-1 print:text-[9pt] print:text-black print-col-min">{s.missingCount}</td>
                       <td className="px-6 py-5 print:py-1">
                         <div className="flex flex-wrap gap-2 print:gap-1">
                           {s.missingSubjects.map((sub: string, ssi: number) => (
