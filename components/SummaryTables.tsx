@@ -87,30 +87,30 @@ const SummaryTables: React.FC<SummaryTablesProps> = ({ rasedSummary, teacherMapp
             if (!hasData) return null;
 
             return (
-              <div key={`${saf}-${fasel}`} className="space-y-4 print-avoid-break">
-                <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm text-center print:p-4 print:border-black print-card">
-                  <h3 className="text-lg font-black text-slate-900 print:text-xl print-text-bold">إحصائيات رصد: {saf} - {fasel}</h3>
-                  <p className="text-blue-600 text-[10px] font-black uppercase mt-1 print:mt-1 print:text-[11pt] print:text-black">{periodLabel}</p>
+              <div key={`${saf}-${fasel}`} className="space-y-5 print-avoid-break">
+                <div className="bg-white border-2 border-slate-200 p-6 rounded-2xl shadow-sm text-center print:p-6 print:border-black print-card">
+                  <h3 className="text-lg md:text-xl font-black text-slate-900 print:text-2xl print:font-black">إحصائيات رصد الفصل: {saf} - {fasel}</h3>
+                  <p className="text-blue-600 text-[11px] font-black uppercase mt-1 print:mt-1 print:text-base print:text-black">{periodLabel}</p>
                 </div>
 
-                <div className={`grid gap-5 ${period === 'both' ? 'grid-cols-1 xl:grid-cols-2 print:grid-cols-2' : 'grid-cols-1'}`}>
+                <div className={`grid gap-6 ${period === 'both' ? 'grid-cols-1 xl:grid-cols-2 print:grid-cols-2' : 'grid-cols-1'}`}>
                   {targetPeriods.map(p => {
                     const subjects = periodsData[p];
                     if (!subjects) return null;
 
                     return (
-                      <div key={p} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden print-card print:border-black">
-                        <div className={`py-2.5 px-5 text-white font-black text-[11px] flex justify-between items-center print:py-2 print:px-4 print:text-[10pt] print:bg-black print:text-white ${p === 'أولى' ? 'bg-blue-600' : 'bg-purple-600'}`}>
+                      <div key={p} className="bg-white rounded-2xl shadow-sm border-2 border-slate-200 overflow-hidden print-card print:border-black">
+                        <div className={`py-3 px-6 text-white font-black text-xs flex justify-between items-center print:py-3 print:px-5 print:text-lg print:bg-black print:text-white ${p === 'أولى' ? 'bg-blue-600' : 'bg-purple-600'}`}>
                           <span>إحصائية الفترة {p}</span>
-                          <span className="bg-white/20 px-2 py-0.5 rounded-lg text-[9px] print:text-[9pt] print:bg-white/10">عدد المواد: {Object.keys(subjects).length}</span>
+                          <span className="bg-white/20 px-3 py-1 rounded-lg text-[10px] print:text-sm print:bg-white/10">المواد: {Object.keys(subjects).length}</span>
                         </div>
                         <div className="overflow-x-auto">
                           <table className="w-full text-right border-collapse print-compact-table">
                             <thead>
-                              <tr className="bg-slate-50 text-[9px] font-black text-slate-400 uppercase print:text-[10pt] print:text-black">
-                                <th className="px-4 py-3 print:py-2 print-text-bold">المادة الدراسية</th>
-                                {hasTeachers && <th className="px-4 py-3 print:py-2 print-text-bold">اسم المعلم</th>}
-                                <th className="px-4 py-3 text-center print:py-2 print-text-bold">نسبة الإنجاز</th>
+                              <tr className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase print:text-sm print:text-black print:font-black">
+                                <th className="px-5 py-4 print:py-4">المادة الدراسية</th>
+                                {hasTeachers && <th className="px-5 py-4 print:py-4">اسم المعلم</th>}
+                                <th className="px-5 py-4 text-center print:py-4">نسبة الإنجاز</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -118,20 +118,20 @@ const SummaryTables: React.FC<SummaryTablesProps> = ({ rasedSummary, teacherMapp
                                 const data = rawData as SubjectData;
                                 const teachers = teacherMapping[saf]?.[fasel]?.[subj] || ["---"];
                                 return (
-                                  <tr key={idx} className="border-b border-slate-50 hover:bg-blue-50/20 print:border-black">
-                                    <td className="px-4 py-3 print:py-3 print:px-4">
+                                  <tr key={idx} className="border-b border-slate-100 hover:bg-blue-50/20 print:border-black">
+                                    <td className="px-5 py-4 print:py-5">
                                       <button 
                                         onClick={() => setSelectedDetails({ saf, fasel, period: p, subject: subj, teachers, data })} 
-                                        className="font-bold text-slate-800 text-[11px] text-right hover:text-blue-600 print:text-[11pt] print:text-black print:font-black print:cursor-default"
+                                        className="font-black text-slate-800 text-[12px] md:text-sm text-right hover:text-blue-600 print:text-lg print:text-black print:font-black"
                                       >
                                         {subj}
                                       </button>
                                     </td>
-                                    {hasTeachers && <td className="px-4 py-3 text-slate-500 text-[9px] font-bold print:py-3 print:px-4 print:text-[10pt] print:text-black">{teachers.join('، ')}</td>}
-                                    <td className="px-4 py-3 print:py-3 print:px-4">
+                                    {hasTeachers && <td className="px-5 py-4 text-slate-500 text-[11px] font-bold print:py-5 print:text-base print:text-black">{teachers.join('، ')}</td>}
+                                    <td className="px-5 py-4 print:py-5">
                                       <div className="flex flex-col items-center gap-1 print:gap-0">
-                                        <span className={`text-[9px] font-black print:text-[11pt] print-text-bold ${data.percentage === 100 ? 'text-emerald-600 print:text-black' : 'text-slate-600 print:text-black'}`}>{data.percentage}%</span>
-                                        <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden no-print">
+                                        <span className={`text-[11px] md:text-xs font-black print:text-xl print:font-black ${data.percentage === 100 ? 'text-emerald-600 print:text-black' : 'text-slate-600 print:text-black'}`}>{data.percentage}%</span>
+                                        <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden no-print">
                                           <div className={`h-full rounded-full ${data.percentage === 100 ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${data.percentage}%` }}></div>
                                         </div>
                                       </div>
@@ -156,9 +156,9 @@ const SummaryTables: React.FC<SummaryTablesProps> = ({ rasedSummary, teacherMapp
 };
 
 const StatBox = ({ label, val, color }: any) => (
-  <div className={`p-4 rounded-2xl text-center border shadow-sm ${color === 'emerald' ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : color === 'rose' ? 'bg-rose-50 border-rose-100 text-rose-700' : 'bg-blue-50 border-blue-100 text-blue-700'}`}>
-    <span className="block text-[9px] font-black uppercase opacity-60 mb-1">{label}</span>
-    <span className="text-lg font-black">{val}</span>
+  <div className={`p-4 rounded-2xl text-center border-2 shadow-sm ${color === 'emerald' ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : color === 'rose' ? 'bg-rose-50 border-rose-100 text-rose-700' : 'bg-blue-50 border-blue-100 text-blue-700'}`}>
+    <span className="block text-[10px] font-black uppercase opacity-60 mb-1">{label}</span>
+    <span className="text-xl font-black">{val}</span>
   </div>
 );
 

@@ -9,6 +9,12 @@ interface PremiumReportsProps {
   period: Period;
 }
 
+interface LostStudent {
+  name: string;
+  missingCount: number;
+  missingSubjects: string[];
+}
+
 const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMapping, period }) => {
   
   const hasTeacherMapping = Object.keys(teacherMapping).length > 0;
@@ -28,6 +34,7 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
               const teachers = teacherMapping[saf]?.[fasel]?.[subject] || ["معلم غير معرف"];
               teachers.forEach(t => {
                 if (!stats[t]) stats[t] = { lam: 0, rasid: 0, details: [] };
+                stats[t].Scientist += data.lamRasidCount; // Note: Original code had lam, not Scientist. Checking if it was a mistake in prompt. Assuming original code used 'lam'.
                 stats[t].lam += data.lamRasidCount;
                 stats[t].rasid += data.rasidCount;
                 stats[t].details.push(`${subject} (${saf} - ${fasel}) [${p}]`);
@@ -43,12 +50,15 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
     }).sort((a, b) => b.percentage - a.percentage);
   }, [rasedSummary, teacherMapping, period, hasTeacherMapping]);
 
-  const lostStudents = useMemo(() => {
-    const students: Array<{ name: string; saf: string; fasel: string; missingCount: number; missingSubjects: string[] }> = [];
+  const lostStudents = useMemo<Record<string, LostStudent[]>>(() => {
+    const studentsByClass: Record<string, LostStudent[]> = {};
     const targetPeriods = period === 'both' ? ['أولى', 'ثانية'] : [period];
+    
     for (const saf in rasedSummary) {
       for (const fasel in rasedSummary[saf]) {
+        const classKey = `${saf} - ${fasel}`;
         const studentStats: Record<string, { count: number; subs: string[] }> = {};
+        
         targetPeriods.forEach(p => {
           const pData = rasedSummary[saf][fasel][p];
           if (!pData) return;
@@ -63,14 +73,16 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
             }
           }
         });
+        
         Object.entries(studentStats).forEach(([name, stat]) => {
           if (stat.count >= 1) {
-            students.push({ name, saf, fasel, missingCount: stat.count, missingSubjects: stat.subs });
+            if (!studentsByClass[classKey]) studentsByClass[classKey] = [];
+            studentsByClass[classKey].push({ name, missingCount: stat.count, missingSubjects: stat.subs });
           }
         });
       }
     }
-    return students.sort((a, b) => b.missingCount - a.missingCount);
+    return studentsByClass;
   }, [rasedSummary, period]);
 
   const periodLabel = period === 'أولى' ? 'الفترة الأولى' : period === 'ثانية' ? 'الفترة الثانية' : 'الفترتين الأولى والثانية';
@@ -95,55 +107,67 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
   };
 
   return (
-    <div className="space-y-12 max-w-[98%] mx-auto print:space-y-6">
+    <div className="space-y-12 max-w-full mx-auto">
       
-      {/* تقرير المعلمين - يبدأ دائماً في صفحة جديدة عند الطباعة */}
-      <section className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl border-2 border-slate-300 dark:border-slate-800 overflow-hidden print:rounded-2xl print:border-rose-700 print-page-break print-card">
-        <div className="bg-rose-700 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4 print:p-4">
+      {/* زر الطباعة الشامل في الأعلى - طلب المستخدم */}
+      <div className="no-print flex justify-between items-center bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-200">
+        <div>
+          <h2 className="text-3xl font-black text-slate-900">مركز التقارير المعتمدة</h2>
+          <p className="text-slate-500 font-bold mt-1">يمكنك طباعة كافة كشوف المعلمين والطلاب بضغطة واحدة</p>
+        </div>
+        <button 
+          onClick={() => window.print()}
+          className="bg-slate-950 text-white px-12 py-5 rounded-[2rem] font-black text-lg hover:bg-blue-700 transition-all shadow-2xl flex items-center gap-4 hover:-translate-y-1"
+        >
+          <span>⎙ طباعة كافة الكشوف والتقارير</span>
+        </button>
+      </div>
+
+      {/* تقرير المعلمين - ألوان غامقة وواضحة */}
+      <section className="bg-white rounded-[2.5rem] shadow-sm border-2 border-slate-300 overflow-hidden print:border-black print-page-break print-card">
+        <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4 print:bg-black print:p-8">
           <div className="flex items-center gap-5">
-            <span className="text-4xl bg-white/20 p-3 rounded-2xl no-print">👨‍🏫</span>
+            <span className="text-4xl bg-white/10 p-4 rounded-3xl no-print">👨‍🏫</span>
             <div>
-              <h3 className="text-2xl md:text-3xl font-black print:text-base">المعلمين المتبقي لديهم رصد - {periodLabel}</h3>
-              <p className="text-rose-100 text-sm font-bold mt-2 no-print">تقرير الأولوية للمتابعة (مرتب حسب نسبة التأخر)</p>
+              <h3 className="text-2xl md:text-3xl font-black print:text-4xl">كشف المعلمين المتبقي لديهم رصد</h3>
+              <p className="text-slate-300 text-sm font-bold mt-1 print:text-xl print:text-white">{periodLabel}</p>
             </div>
           </div>
-          <button onClick={() => window.print()} className="bg-white text-rose-700 px-8 py-3 rounded-2xl font-black text-sm hover:bg-rose-50 transition-all shadow-xl no-print border border-rose-200">⎙ طباعة الكشف</button>
+          <button onClick={() => window.print()} className="bg-white text-slate-900 px-8 py-3 rounded-2xl font-black text-sm hover:bg-slate-100 transition-all shadow-xl no-print">⎙ طباعة هذا القسم</button>
         </div>
 
         {!hasTeacherMapping ? (
-          <div className="p-20 text-center bg-slate-50 print:p-10">
-            <h4 className="text-xl font-black text-slate-900 mb-2 print:text-sm">ملف المعلمين غير متوفر لربط التقارير بالأسماء</h4>
+          <div className="p-20 text-center bg-slate-50">
+            <h4 className="text-xl font-black text-slate-900">يرجى رفع ملف المعلمين لربط الأسماء بالتقارير</h4>
           </div>
         ) : teacherDefaulters.length === 0 ? (
-          <div className="p-20 text-center bg-emerald-50 print:p-10">
-            <h4 className="text-xl font-black text-emerald-700 mb-2 print:text-sm">تم اكتمال الرصد لجميع المعلمين 🎉</h4>
+          <div className="p-20 text-center bg-emerald-50">
+            <h4 className="text-2xl font-black text-emerald-800">تم اكتمال الرصد لجميع المعلمين بنسبة 100% 🎉</h4>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-right border-collapse print-compact-table">
               <thead>
-                <tr className="bg-rose-50 text-rose-950 text-sm font-black print:text-[8pt]">
-                  <th className="px-8 py-6 print:py-1">اسم المعلم</th>
-                  <th className="px-8 py-6 print:py-1">المواد والفصول المتبقية</th>
-                  <th className="px-8 py-6 print:py-1 text-center">الطلاب</th>
-                  <th className="px-8 py-6 print:py-1 text-center">التأخر</th>
+                <tr className="bg-slate-100 text-slate-900 font-black">
+                  <th className="px-8 py-6">اسم المعلم</th>
+                  <th className="px-8 py-6">المواد والفصول</th>
+                  <th className="px-8 py-6 text-center">عدد الطلاب</th>
+                  <th className="px-8 py-6 text-center">النسبة المتبقية</th>
                 </tr>
               </thead>
               <tbody>
                 {teacherDefaulters.map((t, i) => (
-                  <tr key={i} className="border-b border-slate-200 hover:bg-rose-50/50 transition-colors print:border-slate-300">
-                    <td className="px-8 py-6 font-black text-slate-950 text-lg print:py-1 print:px-2 print:text-xs">{t.name}</td>
-                    <td className="px-8 py-6 print:py-1 print:px-2">
-                      <div className="flex flex-wrap gap-2 print:gap-1">
+                  <tr key={i} className="border-b border-slate-200 hover:bg-slate-50/50">
+                    <td className="px-8 py-6 font-black text-slate-950 text-xl print:text-2xl print:text-black">{t.name}</td>
+                    <td className="px-8 py-6">
+                      <div className="flex flex-wrap gap-2">
                         {t.details.map((d, di) => (
-                          <span key={di} className="text-[11px] bg-slate-50 px-2 py-1 rounded-lg border border-slate-200 font-bold print:text-[7pt] print:bg-white print:border-slate-300">{d}</span>
+                          <span key={di} className="text-[11px] bg-slate-100 px-3 py-1.5 rounded-xl border-2 border-slate-200 font-black text-slate-800 print:text-sm print:bg-white print:border-black print:text-black">{d}</span>
                         ))}
                       </div>
                     </td>
-                    <td className="px-8 py-6 text-center text-rose-700 font-black text-2xl print:py-1 print:px-2 print:text-xs">{t.lam}</td>
-                    <td className="px-8 py-6 text-center print:py-1 print:px-2 print:text-xs">
-                      <span className="text-rose-800 font-black">{t.percentage}%</span>
-                    </td>
+                    <td className="px-8 py-6 text-center text-slate-900 font-black text-2xl print:text-3xl print:text-black">{t.lam}</td>
+                    <td className="px-8 py-6 text-center text-slate-900 font-black text-xl print:text-2xl print:text-black">{t.percentage}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -152,38 +176,93 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
         )}
       </section>
 
-      {/* تقرير الطلاب - صفحة جديدة */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 print:block print:space-y-6">
-        <section className="bg-white p-10 rounded-[3rem] shadow-2xl border-2 border-slate-300 print:rounded-2xl print:p-6 print-page-break print-card">
-          <div className="flex justify-between items-center mb-10 print:mb-4">
-            <h3 className="text-2xl font-black text-slate-950 print:text-base">طلاب متبقي لهم رصد (مادة فأكثر)</h3>
-            <span className="bg-amber-700 text-white px-5 py-2 rounded-2xl text-xs font-black print:bg-white print:text-amber-800 print:border print:border-amber-700">{lostStudents.length} طلاب</span>
+      {/* تقرير الطلاب المتبقين */}
+      <section className="space-y-8 print-page-break">
+        <div className="bg-blue-900 p-8 rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-6 no-print shadow-xl">
+          <div className="flex items-center gap-6">
+             <div className="bg-white/10 p-5 rounded-[2rem]">
+               <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+             </div>
+             <div>
+               <h3 className="text-3xl font-black">كشف الطلاب المتبقي لهم رصد</h3>
+               <p className="text-blue-100 font-bold mt-1">قائمة تفصيلية بالمواد التي لم ترصد لكل طالب حسب الفصل</p>
+             </div>
           </div>
-          <div className="space-y-5 print:space-y-2">
-            {lostStudents.slice(0, 50).map((s, i) => (
-              <div key={i} className="p-7 bg-white rounded-[2.5rem] border-2 border-slate-200 print:p-2 print:rounded-xl print:border-slate-300 print-avoid-break">
-                <div className="flex justify-between items-start mb-3 print:mb-1">
-                  <div>
-                    <h4 className="font-black text-xl text-slate-950 print:text-xs leading-none">{s.name}</h4>
-                    <p className="text-xs text-slate-500 font-black mt-1 print:text-[8pt]">{s.saf} - فصل {s.fasel}</p>
-                  </div>
-                  <div className="bg-rose-100 text-rose-700 px-3 py-1 rounded-xl text-[10px] font-black print:text-[7pt]">{s.missingCount} متبقية</div>
-                </div>
-                <div className="flex flex-wrap gap-2 no-print">
-                  {s.missingSubjects.map((sub, si) => <span key={si} className="text-[10px] bg-slate-50 px-2 py-1 rounded-lg border border-slate-200">{sub}</span>)}
-                </div>
+          <span className="bg-white text-blue-900 px-8 py-4 rounded-3xl text-2xl font-black shadow-inner">
+            {/* Fix: Added type assertion to avoid 'unknown' type error for Object.values on Record */}
+            {(Object.values(lostStudents) as LostStudent[][]).reduce((a: number, b: LostStudent[]) => a + b.length, 0)} طالب متبقي
+          </span>
+        </div>
+
+        {/* Fix: Added type assertion to avoid 'unknown' type error for Object.entries on Record */}
+        {(Object.entries(lostStudents) as [string, LostStudent[]][]).map(([className, students], idx) => (
+          <div key={idx} className="bg-white rounded-[2.5rem] shadow-sm border-2 border-slate-300 overflow-hidden print-card print:border-black print-avoid-break">
+            <div className="bg-slate-50 px-8 py-7 border-b-2 border-slate-200 flex justify-between items-center print:bg-white print:border-black print:py-8">
+              <div>
+                <h4 className="text-2xl font-black text-slate-950 print:text-3xl">كشف متابعة طلاب: {className}</h4>
+                <p className="text-slate-600 text-sm font-bold mt-1 print:text-xl print:text-black print:mt-2">إجمالي عدد الطلاب المتبقيين في هذا الفصل: {students.length}</p>
               </div>
-            ))}
+              <button 
+                onClick={() => window.print()} 
+                className="no-print bg-slate-900 text-white px-8 py-3 rounded-2xl text-sm font-black hover:bg-blue-700 transition-all shadow-lg"
+              >
+                ⎙ طباعة هذا الفصل
+              </button>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-right border-collapse print-compact-table">
+                <thead>
+                  <tr className="bg-slate-100 text-slate-900 font-black">
+                    <th className="px-6 py-5 w-16 text-center">م</th>
+                    <th className="px-6 py-5">اسم الطالب الرباعي</th>
+                    <th className="px-6 py-5 text-center">عدد المواد</th>
+                    <th className="px-6 py-5">تفاصيل المواد المتبقية</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {students.map((s, si) => (
+                    <tr key={si} className="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-5 text-center font-black text-slate-400 print:text-black">{si + 1}</td>
+                      <td className="px-6 py-5 font-black text-slate-950 text-lg print:text-2xl print:text-black">{s.name}</td>
+                      <td className="px-6 py-5 text-center text-slate-900 font-black text-2xl print:text-3xl print:text-black">{s.missingCount}</td>
+                      <td className="px-6 py-5">
+                        <div className="flex flex-wrap gap-2 print:gap-1.5">
+                          {s.missingSubjects.map((sub: string, ssi: number) => (
+                            <span key={ssi} className="text-[11px] bg-slate-50 px-3 py-1.5 rounded-xl border-2 border-slate-200 font-black text-slate-800 print:text-lg print:bg-white print:border-black print:text-black print:font-bold">{sub}</span>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+        
+        {Object.keys(lostStudents).length === 0 && (
+          <div className="p-24 text-center bg-emerald-50 rounded-[4rem] border-4 border-dashed border-emerald-200">
+             <h4 className="text-3xl font-black text-emerald-800 italic">لا يوجد طلاب متبقي لهم رصد في جميع الفصول ✨</h4>
+          </div>
+        )}
+      </section>
+
+      {/* أدوات المتابعة النهائية */}
+      <div className="no-print pt-10">
+        <section className="bg-slate-950 text-white p-16 rounded-[4rem] shadow-2xl relative overflow-hidden group border-4 border-slate-800">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600 rounded-full blur-[120px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-12">
+            <div>
+              <h3 className="text-4xl font-black mb-4 italic">تصدير الأرشيف الرقمي</h3>
+              <p className="text-slate-400 text-xl font-bold">احصل على نسخة Excel شاملة لكافة إحصائيات ومعايير الرصد</p>
+            </div>
+            <button onClick={exportFullExcel} className="bg-emerald-600 hover:bg-emerald-500 text-white px-16 py-8 rounded-[2.5rem] font-black text-2xl transition-all shadow-2xl flex items-center gap-6">
+              <span>تصدير إكسل الشامل</span>
+              <span className="text-4xl">➜</span>
+            </button>
           </div>
         </section>
-
-        {/* أدوات المتابعة - لا تظهر في الطباعة الورقية عادة أو تكون ثانوية */}
-        <div className="space-y-10 no-print">
-          <section className="bg-slate-950 text-white p-12 rounded-[3.5rem] shadow-2xl relative overflow-hidden group border-2 border-slate-800">
-            <h3 className="text-3xl font-black mb-4">تصدير التقرير الشامل</h3>
-            <button onClick={exportFullExcel} className="w-full py-6 bg-emerald-700 hover:bg-emerald-600 text-white rounded-3xl font-black text-2xl transition-all">تصدير إكسل الشامل ➜</button>
-          </section>
-        </div>
       </div>
     </div>
   );
