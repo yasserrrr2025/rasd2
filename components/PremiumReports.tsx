@@ -34,7 +34,6 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
               const teachers = teacherMapping[saf]?.[fasel]?.[subject] || ["معلم غير معرف"];
               teachers.forEach(t => {
                 if (!stats[t]) stats[t] = { lam: 0, rasid: 0, details: [] };
-                stats[t].Scientist += data.lamRasidCount; // Note: Original code had lam, not Scientist. Checking if it was a mistake in prompt. Assuming original code used 'lam'.
                 stats[t].lam += data.lamRasidCount;
                 stats[t].rasid += data.rasidCount;
                 stats[t].details.push(`${subject} (${saf} - ${fasel}) [${p}]`);
@@ -107,9 +106,8 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
   };
 
   return (
-    <div className="space-y-12 max-w-full mx-auto">
+    <div className="space-y-12 max-w-full mx-auto print:space-y-6">
       
-      {/* زر الطباعة الشامل في الأعلى - طلب المستخدم */}
       <div className="no-print flex justify-between items-center bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-200">
         <div>
           <h2 className="text-3xl font-black text-slate-900">مركز التقارير المعتمدة</h2>
@@ -123,51 +121,50 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
         </button>
       </div>
 
-      {/* تقرير المعلمين - ألوان غامقة وواضحة */}
-      <section className="bg-white rounded-[2.5rem] shadow-sm border-2 border-slate-300 overflow-hidden print:border-black print-page-break print-card">
-        <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4 print:bg-black print:p-8">
+      <section className="bg-white rounded-[2.5rem] shadow-sm border-2 border-slate-300 overflow-hidden print:border-black print-card print-avoid-break">
+        <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4 print:bg-slate-100 print:text-black print:p-4 print:border-b-2 print:border-black">
           <div className="flex items-center gap-5">
             <span className="text-4xl bg-white/10 p-4 rounded-3xl no-print">👨‍🏫</span>
             <div>
-              <h3 className="text-2xl md:text-3xl font-black print:text-4xl">كشف المعلمين المتبقي لديهم رصد</h3>
-              <p className="text-slate-300 text-sm font-bold mt-1 print:text-xl print:text-white">{periodLabel}</p>
+              <h3 className="text-2xl md:text-3xl font-black print:text-base">كشف المعلمين المتبقي لديهم رصد</h3>
+              <p className="text-slate-300 text-sm font-bold mt-1 print:text-[8pt] print:text-black">{periodLabel}</p>
             </div>
           </div>
           <button onClick={() => window.print()} className="bg-white text-slate-900 px-8 py-3 rounded-2xl font-black text-sm hover:bg-slate-100 transition-all shadow-xl no-print">⎙ طباعة هذا القسم</button>
         </div>
 
         {!hasTeacherMapping ? (
-          <div className="p-20 text-center bg-slate-50">
-            <h4 className="text-xl font-black text-slate-900">يرجى رفع ملف المعلمين لربط الأسماء بالتقارير</h4>
+          <div className="p-20 text-center bg-slate-50 print:p-10">
+            <h4 className="text-xl font-black text-slate-900 print:text-sm">يرجى رفع ملف المعلمين لربط الأسماء بالتقارير</h4>
           </div>
         ) : teacherDefaulters.length === 0 ? (
-          <div className="p-20 text-center bg-emerald-50">
-            <h4 className="text-2xl font-black text-emerald-800">تم اكتمال الرصد لجميع المعلمين بنسبة 100% 🎉</h4>
+          <div className="p-20 text-center bg-emerald-50 print:p-10">
+            <h4 className="text-2xl font-black text-emerald-800 print:text-sm">تم اكتمال الرصد لجميع المعلمين بنسبة 100% 🎉</h4>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto print:overflow-visible">
             <table className="w-full text-right border-collapse print-compact-table">
               <thead>
-                <tr className="bg-slate-100 text-slate-900 font-black">
-                  <th className="px-8 py-6">اسم المعلم</th>
-                  <th className="px-8 py-6">المواد والفصول</th>
-                  <th className="px-8 py-6 text-center">عدد الطلاب</th>
-                  <th className="px-8 py-6 text-center">النسبة المتبقية</th>
+                <tr className="bg-slate-100 text-slate-900 font-black print:bg-slate-50 print:text-black">
+                  <th className="px-8 py-6 print:py-2 print:text-[8pt] print:border-black">اسم المعلم</th>
+                  <th className="px-8 py-6 print:py-2 print:text-[8pt] print:border-black">المواد والفصول</th>
+                  <th className="px-8 py-6 text-center print:py-2 print:text-[8pt] print:border-black">عدد الطلاب</th>
+                  <th className="px-8 py-6 text-center print:py-2 print:text-[8pt] print:border-black">النسبة</th>
                 </tr>
               </thead>
               <tbody>
                 {teacherDefaulters.map((t, i) => (
-                  <tr key={i} className="border-b border-slate-200 hover:bg-slate-50/50">
-                    <td className="px-8 py-6 font-black text-slate-950 text-xl print:text-2xl print:text-black">{t.name}</td>
-                    <td className="px-8 py-6">
-                      <div className="flex flex-wrap gap-2">
+                  <tr key={i} className="border-b border-slate-200 hover:bg-slate-50/50 print:border-black">
+                    <td className="px-8 py-6 font-black text-slate-950 text-xl print:py-1 print:text-[8pt] print:text-black">{t.name}</td>
+                    <td className="px-8 py-6 print:py-1">
+                      <div className="flex flex-wrap gap-2 print:gap-1">
                         {t.details.map((d, di) => (
-                          <span key={di} className="text-[11px] bg-slate-100 px-3 py-1.5 rounded-xl border-2 border-slate-200 font-black text-slate-800 print:text-sm print:bg-white print:border-black print:text-black">{d}</span>
+                          <span key={di} className="text-[11px] bg-slate-100 px-3 py-1.5 rounded-xl border-2 border-slate-200 font-black text-slate-800 print:text-[7pt] print:bg-white print:border-black print:px-1 print:py-0">{d}</span>
                         ))}
                       </div>
                     </td>
-                    <td className="px-8 py-6 text-center text-slate-900 font-black text-2xl print:text-3xl print:text-black">{t.lam}</td>
-                    <td className="px-8 py-6 text-center text-slate-900 font-black text-xl print:text-2xl print:text-black">{t.percentage}%</td>
+                    <td className="px-8 py-6 text-center text-slate-900 font-black text-2xl print:py-1 print:text-[9pt] print:text-black">{t.lam}</td>
+                    <td className="px-8 py-6 text-center text-slate-900 font-black text-xl print:py-1 print:text-[8pt] print:text-black">{t.percentage}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -176,8 +173,7 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
         )}
       </section>
 
-      {/* تقرير الطلاب المتبقين */}
-      <section className="space-y-8 print-page-break">
+      <section className="space-y-8 print:space-y-4">
         <div className="bg-blue-900 p-8 rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-6 no-print shadow-xl">
           <div className="flex items-center gap-6">
              <div className="bg-white/10 p-5 rounded-[2rem]">
@@ -189,18 +185,16 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
              </div>
           </div>
           <span className="bg-white text-blue-900 px-8 py-4 rounded-3xl text-2xl font-black shadow-inner">
-            {/* Fix: Added type assertion to avoid 'unknown' type error for Object.values on Record */}
             {(Object.values(lostStudents) as LostStudent[][]).reduce((a: number, b: LostStudent[]) => a + b.length, 0)} طالب متبقي
           </span>
         </div>
 
-        {/* Fix: Added type assertion to avoid 'unknown' type error for Object.entries on Record */}
         {(Object.entries(lostStudents) as [string, LostStudent[]][]).map(([className, students], idx) => (
           <div key={idx} className="bg-white rounded-[2.5rem] shadow-sm border-2 border-slate-300 overflow-hidden print-card print:border-black print-avoid-break">
-            <div className="bg-slate-50 px-8 py-7 border-b-2 border-slate-200 flex justify-between items-center print:bg-white print:border-black print:py-8">
+            <div className="bg-slate-50 px-8 py-7 border-b-2 border-slate-200 flex justify-between items-center print:bg-white print:border-black print:py-3 print:px-4">
               <div>
-                <h4 className="text-2xl font-black text-slate-950 print:text-3xl">كشف متابعة طلاب: {className}</h4>
-                <p className="text-slate-600 text-sm font-bold mt-1 print:text-xl print:text-black print:mt-2">إجمالي عدد الطلاب المتبقيين في هذا الفصل: {students.length}</p>
+                <h4 className="text-2xl font-black text-slate-950 print:text-[10pt]">كشف متابعة طلاب: {className}</h4>
+                <p className="text-slate-600 text-sm font-bold mt-1 print:text-[7pt] print:text-black print:mt-0">الطلاب المتبقيين: {students.length}</p>
               </div>
               <button 
                 onClick={() => window.print()} 
@@ -210,26 +204,26 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
               </button>
             </div>
             
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto print:overflow-visible">
               <table className="w-full text-right border-collapse print-compact-table">
                 <thead>
-                  <tr className="bg-slate-100 text-slate-900 font-black">
-                    <th className="px-6 py-5 w-16 text-center">م</th>
-                    <th className="px-6 py-5">اسم الطالب الرباعي</th>
-                    <th className="px-6 py-5 text-center">عدد المواد</th>
-                    <th className="px-6 py-5">تفاصيل المواد المتبقية</th>
+                  <tr className="bg-slate-100 text-slate-900 font-black print:bg-slate-50 print:text-black">
+                    <th className="px-6 py-5 w-16 text-center print:py-2 print:text-[8pt] print:border-black">م</th>
+                    <th className="px-6 py-5 print:py-2 print:text-[8pt] print:border-black">الاسم</th>
+                    <th className="px-6 py-5 text-center print:py-2 print:text-[8pt] print:border-black">المواد</th>
+                    <th className="px-6 py-5 print:py-2 print:text-[8pt] print:border-black">التفاصيل</th>
                   </tr>
                 </thead>
                 <tbody>
                   {students.map((s, si) => (
-                    <tr key={si} className="border-b border-slate-200 hover:bg-slate-50 transition-colors">
-                      <td className="px-6 py-5 text-center font-black text-slate-400 print:text-black">{si + 1}</td>
-                      <td className="px-6 py-5 font-black text-slate-950 text-lg print:text-2xl print:text-black">{s.name}</td>
-                      <td className="px-6 py-5 text-center text-slate-900 font-black text-2xl print:text-3xl print:text-black">{s.missingCount}</td>
-                      <td className="px-6 py-5">
-                        <div className="flex flex-wrap gap-2 print:gap-1.5">
+                    <tr key={si} className="border-b border-slate-200 hover:bg-slate-50 transition-colors print:border-black">
+                      <td className="px-6 py-5 text-center font-black text-slate-400 print:py-1 print:text-[8pt] print:text-black">{si + 1}</td>
+                      <td className="px-6 py-5 font-black text-slate-950 text-lg print:py-1 print:text-[8pt] print:text-black">{s.name}</td>
+                      <td className="px-6 py-5 text-center text-slate-900 font-black text-2xl print:py-1 print:text-[9pt] print:text-black">{s.missingCount}</td>
+                      <td className="px-6 py-5 print:py-1">
+                        <div className="flex flex-wrap gap-2 print:gap-1">
                           {s.missingSubjects.map((sub: string, ssi: number) => (
-                            <span key={ssi} className="text-[11px] bg-slate-50 px-3 py-1.5 rounded-xl border-2 border-slate-200 font-black text-slate-800 print:text-lg print:bg-white print:border-black print:text-black print:font-bold">{sub}</span>
+                            <span key={ssi} className="text-[11px] bg-slate-50 px-3 py-1.5 rounded-xl border-2 border-slate-200 font-black text-slate-800 print:text-[7pt] print:bg-white print:border-black print:px-1 print:py-0">{sub}</span>
                           ))}
                         </div>
                       </td>
@@ -240,15 +234,8 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
             </div>
           </div>
         ))}
-        
-        {Object.keys(lostStudents).length === 0 && (
-          <div className="p-24 text-center bg-emerald-50 rounded-[4rem] border-4 border-dashed border-emerald-200">
-             <h4 className="text-3xl font-black text-emerald-800 italic">لا يوجد طلاب متبقي لهم رصد في جميع الفصول ✨</h4>
-          </div>
-        )}
       </section>
 
-      {/* أدوات المتابعة النهائية */}
       <div className="no-print pt-10">
         <section className="bg-slate-950 text-white p-16 rounded-[4rem] shadow-2xl relative overflow-hidden group border-4 border-slate-800">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600 rounded-full blur-[120px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
