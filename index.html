@@ -18,39 +18,60 @@
         scroll-behavior: smooth;
         -webkit-font-smoothing: antialiased;
       }
-      /* Smooth transitions for all interactive elements */
       * {
         transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
       }
       @media print {
         @page {
           size: A4 portrait;
-          margin: 10mm;
+          margin: 10mm 8mm;
         }
         .no-print { display: none !important; }
         body { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
+        
+        .print-page-break {
+          page-break-before: always;
+          break-before: page;
+        }
+
+        .print-avoid-break {
+          page-break-inside: avoid;
+          break-inside: avoid;
+        }
+
+        .print-table-header {
+          display: table-header-group !important;
+        }
+
         .print-card { 
-          border: 1px solid #000 !important; 
+          border: 1px solid #e2e8f0 !important; 
           box-shadow: none !important; 
           background: white !important; 
-          margin-bottom: 0 !important;
-          border-radius: 0 !important;
-          break-after: page;
-          page-break-after: always;
+          border-radius: 12px !important;
+          margin-bottom: 20px !important;
         }
+
         .print-compact-table {
           width: 100% !important;
           table-layout: auto !important;
+          border-collapse: collapse !important;
         }
+
+        .print-compact-table thead {
+          display: table-header-group !important;
+        }
+
         .print-compact-table td, .print-compact-table th { 
-          padding: 2px 4px !important; 
+          padding: 4px 6px !important; 
           font-size: 8pt !important;
-          border: 0.5pt solid #000 !important;
-          color: black !important;
+          border: 0.5pt solid #cbd5e1 !important;
         }
-        .print-compact-table th {
-          background-color: #f8fafc !important;
-          -webkit-print-color-adjust: exact;
+        
+        /* ترويسة ثابتة عند الطباعة */
+        .print-section-header {
+          border-bottom: 2px solid #2563eb !important;
+          margin-bottom: 15px !important;
+          padding-bottom: 8px !important;
         }
       }
       .custom-shadow {

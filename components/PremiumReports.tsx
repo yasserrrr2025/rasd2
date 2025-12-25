@@ -13,19 +13,15 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
   
   const hasTeacherMapping = Object.keys(teacherMapping).length > 0;
 
-  // تقرير المعلمين المقصرين - مرتب من الأعلى نسبة تقصير
   const teacherDefaulters = useMemo(() => {
     if (!hasTeacherMapping) return [];
-
     const stats: Record<string, { lam: number; rasid: number; details: string[] }> = {};
     const targetPeriods = period === 'both' ? ['أولى', 'ثانية'] : [period];
-
     for (const saf in rasedSummary) {
       for (const fasel in rasedSummary[saf]) {
         targetPeriods.forEach(p => {
           const pData = rasedSummary[saf][fasel][p];
           if (!pData) return;
-
           for (const subject in pData) {
             const data = pData[subject];
             if (data.lamRasidCount > 0) {
@@ -41,29 +37,18 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
         });
       }
     }
-
-    return Object.entries(stats)
-      .map(([name, data]) => {
-        const total = data.lam + data.rasid;
-        return {
-          name,
-          lam: data.lam,
-          rasid: data.rasid,
-          percentage: Number(((data.lam / total) * 100).toFixed(1)),
-          details: Array.from(new Set(data.details))
-        };
-      })
-      .sort((a, b) => b.percentage - a.percentage); // الترتيب من الأعلى نسبة تقصير
+    return Object.entries(stats).map(([name, data]) => {
+      const total = data.lam + data.rasid;
+      return { name, lam: data.lam, rasid: data.rasid, percentage: Number(((data.lam / total) * 100).toFixed(1)), details: Array.from(new Set(data.details)) };
+    }).sort((a, b) => b.percentage - a.percentage);
   }, [rasedSummary, teacherMapping, period, hasTeacherMapping]);
 
   const lostStudents = useMemo(() => {
     const students: Array<{ name: string; saf: string; fasel: string; missingCount: number; missingSubjects: string[] }> = [];
     const targetPeriods = period === 'both' ? ['أولى', 'ثانية'] : [period];
-
     for (const saf in rasedSummary) {
       for (const fasel in rasedSummary[saf]) {
         const studentStats: Record<string, { count: number; subs: string[] }> = {};
-        
         targetPeriods.forEach(p => {
           const pData = rasedSummary[saf][fasel][p];
           if (!pData) return;
@@ -78,17 +63,9 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
             }
           }
         });
-
         Object.entries(studentStats).forEach(([name, stat]) => {
-          // تم التعديل ليشمل مادة واحدة فأكثر
           if (stat.count >= 1) {
-            students.push({
-              name,
-              saf,
-              fasel,
-              missingCount: stat.count,
-              missingSubjects: stat.subs
-            });
+            students.push({ name, saf, fasel, missingCount: stat.count, missingSubjects: stat.subs });
           }
         });
       }
@@ -108,16 +85,7 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
           if (!pData) return;
           Object.entries(pData).forEach(([sub, rawData]) => {
             const data = rawData as SubjectData;
-            summaryRows.push({
-              "الصف": saf,
-              "الفصل": fasel,
-              "الفترة": p,
-              "المادة": sub,
-              "تم الرصد": data.rasidCount,
-              "لم يرصد": data.lamRasidCount,
-              "النسبة": `${data.percentage}%`,
-              "المعلم": (teacherMapping[saf]?.[fasel]?.[sub] || []).join(' ، ')
-            });
+            summaryRows.push({ "الصف": saf, "الفصل": fasel, "الفترة": p, "المادة": sub, "تم الرصد": data.rasidCount, "لم يرصد": data.lamRasidCount, "النسبة": `${data.percentage}%`, "المعلم": (teacherMapping[saf]?.[fasel]?.[sub] || []).join(' ، ') });
           });
         });
       }
@@ -127,68 +95,54 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
   };
 
   return (
-    <div className="space-y-12 max-w-[98%] mx-auto">
-      {/* تقرير المعلمين المتبقي لديهم رصد */}
-      <section className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl border-2 border-slate-300 dark:border-slate-800 overflow-hidden animate-in slide-in-from-top-6 duration-700">
-        <div className="bg-rose-700 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4">
+    <div className="space-y-12 max-w-[98%] mx-auto print:space-y-6">
+      
+      {/* تقرير المعلمين - يبدأ دائماً في صفحة جديدة عند الطباعة */}
+      <section className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl border-2 border-slate-300 dark:border-slate-800 overflow-hidden print:rounded-2xl print:border-rose-700 print-page-break print-card">
+        <div className="bg-rose-700 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4 print:p-4">
           <div className="flex items-center gap-5">
-            <span className="text-4xl bg-white/20 p-3 rounded-2xl">👨‍🏫</span>
+            <span className="text-4xl bg-white/20 p-3 rounded-2xl no-print">👨‍🏫</span>
             <div>
-              <h3 className="text-2xl md:text-3xl font-black">المعلمين المتبقي لديهم رصد - {periodLabel}</h3>
-              <p className="text-rose-100 text-sm font-bold mt-2">تقرير الأولوية للمتابعة (مرتب حسب نسبة التأخر)</p>
+              <h3 className="text-2xl md:text-3xl font-black print:text-base">المعلمين المتبقي لديهم رصد - {periodLabel}</h3>
+              <p className="text-rose-100 text-sm font-bold mt-2 no-print">تقرير الأولوية للمتابعة (مرتب حسب نسبة التأخر)</p>
             </div>
           </div>
-          {hasTeacherMapping && teacherDefaulters.length > 0 && (
-            <button onClick={() => window.print()} className="bg-white text-rose-700 px-8 py-3 rounded-2xl font-black text-sm hover:bg-rose-50 transition-all shadow-xl no-print border border-rose-200">
-              ⎙ طباعة الكشف
-            </button>
-          )}
+          <button onClick={() => window.print()} className="bg-white text-rose-700 px-8 py-3 rounded-2xl font-black text-sm hover:bg-rose-50 transition-all shadow-xl no-print border border-rose-200">⎙ طباعة الكشف</button>
         </div>
 
         {!hasTeacherMapping ? (
-          <div className="p-20 text-center bg-slate-50 dark:bg-slate-900">
-            <div className="text-6xl mb-6">⚠️</div>
-            <h4 className="text-xl font-black text-slate-900 dark:text-white mb-2">ملف المعلمين غير متوفر</h4>
-            <p className="text-slate-600 dark:text-slate-400 font-bold max-w-lg mx-auto">يرجى رفع ملف إكسل يحتوي على بيانات المعلمين (الاسم، الصف، المادة، الفصل) لتتمكن من عرض هذا التقرير وتحديد المقصرين بالاسم.</p>
+          <div className="p-20 text-center bg-slate-50 print:p-10">
+            <h4 className="text-xl font-black text-slate-900 mb-2 print:text-sm">ملف المعلمين غير متوفر لربط التقارير بالأسماء</h4>
           </div>
         ) : teacherDefaulters.length === 0 ? (
-          <div className="p-20 text-center bg-emerald-50 dark:bg-emerald-900/10">
-            <div className="text-6xl mb-6">🎉</div>
-            <h4 className="text-xl font-black text-emerald-700 dark:text-emerald-400 mb-2">إنجاز رائع!</h4>
-            <p className="text-slate-600 dark:text-slate-400 font-bold">تم اكتمال رصد جميع المواد لجميع المعلمين في {periodLabel}.</p>
+          <div className="p-20 text-center bg-emerald-50 print:p-10">
+            <h4 className="text-xl font-black text-emerald-700 mb-2 print:text-sm">تم اكتمال الرصد لجميع المعلمين 🎉</h4>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-right border-collapse">
+            <table className="w-full text-right border-collapse print-compact-table">
               <thead>
-                <tr className="bg-rose-50 dark:bg-rose-950/30 text-rose-950 dark:text-rose-200 text-sm font-black">
-                  <th className="px-8 py-6 border-b-2 border-rose-200 dark:border-rose-900/40">اسم المعلم</th>
-                  <th className="px-8 py-6 border-b-2 border-rose-200 dark:border-rose-900/40">المواد والفصول المتبقية</th>
-                  <th className="px-8 py-6 border-b-2 border-rose-200 dark:border-rose-900/40 text-center">عدد الطلاب</th>
-                  <th className="px-8 py-6 border-b-2 border-rose-200 dark:border-rose-900/40 text-center">نسبة التأخر</th>
+                <tr className="bg-rose-50 text-rose-950 text-sm font-black print:text-[8pt]">
+                  <th className="px-8 py-6 print:py-1">اسم المعلم</th>
+                  <th className="px-8 py-6 print:py-1">المواد والفصول المتبقية</th>
+                  <th className="px-8 py-6 print:py-1 text-center">الطلاب</th>
+                  <th className="px-8 py-6 print:py-1 text-center">التأخر</th>
                 </tr>
               </thead>
               <tbody>
                 {teacherDefaulters.map((t, i) => (
-                  <tr key={i} className="border-b border-slate-200 dark:border-slate-800 hover:bg-rose-50/50 dark:hover:bg-rose-900/10 transition-colors">
-                    <td className="px-8 py-6 font-black text-slate-950 dark:text-white text-lg">{t.name}</td>
-                    <td className="px-8 py-6">
-                      <div className="flex flex-wrap gap-2">
+                  <tr key={i} className="border-b border-slate-200 hover:bg-rose-50/50 transition-colors print:border-slate-300">
+                    <td className="px-8 py-6 font-black text-slate-950 text-lg print:py-1 print:px-2 print:text-xs">{t.name}</td>
+                    <td className="px-8 py-6 print:py-1 print:px-2">
+                      <div className="flex flex-wrap gap-2 print:gap-1">
                         {t.details.map((d, di) => (
-                          <span key={di} className="text-[11px] bg-white dark:bg-slate-800 text-slate-950 dark:text-slate-200 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 font-bold shadow-sm">
-                            {d}
-                          </span>
+                          <span key={di} className="text-[11px] bg-slate-50 px-2 py-1 rounded-lg border border-slate-200 font-bold print:text-[7pt] print:bg-white print:border-slate-300">{d}</span>
                         ))}
                       </div>
                     </td>
-                    <td className="px-8 py-6 text-center text-rose-700 dark:text-rose-400 font-black tabular-nums text-2xl">{t.lam}</td>
-                    <td className="px-8 py-6">
-                      <div className="flex flex-col items-center gap-3">
-                        <span className="text-rose-800 dark:text-rose-400 font-black text-lg tabular-nums">{t.percentage}%</span>
-                        <div className="w-40 h-3 bg-rose-100 dark:bg-rose-900/30 rounded-full overflow-hidden border border-rose-300 dark:border-rose-800">
-                          <div className="h-full bg-rose-600" style={{ width: `${t.percentage}%` }}></div>
-                        </div>
-                      </div>
+                    <td className="px-8 py-6 text-center text-rose-700 font-black text-2xl print:py-1 print:px-2 print:text-xs">{t.lam}</td>
+                    <td className="px-8 py-6 text-center print:py-1 print:px-2 print:text-xs">
+                      <span className="text-rose-800 font-black">{t.percentage}%</span>
                     </td>
                   </tr>
                 ))}
@@ -198,80 +152,36 @@ const PremiumReports: React.FC<PremiumReportsProps> = ({ rasedSummary, teacherMa
         )}
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* تقرير الطلاب المتأخرين */}
-        <section className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] shadow-2xl border-2 border-slate-300 dark:border-slate-800">
-          <div className="flex justify-between items-center mb-10">
-            <h3 className="text-2xl font-black flex items-center gap-4 text-slate-950 dark:text-white">
-              <span className="bg-amber-100 dark:bg-amber-900/40 p-3 rounded-2xl text-2xl shadow-inner text-amber-700 border border-amber-200">🔍</span>
-              طلاب متبقي لهم رصد (مادة فأكثر)
-            </h3>
-            <span className="bg-amber-700 text-white px-5 py-2 rounded-2xl text-xs font-black shadow-xl">
-              {lostStudents.length} طلاب
-            </span>
+      {/* تقرير الطلاب - صفحة جديدة */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 print:block print:space-y-6">
+        <section className="bg-white p-10 rounded-[3rem] shadow-2xl border-2 border-slate-300 print:rounded-2xl print:p-6 print-page-break print-card">
+          <div className="flex justify-between items-center mb-10 print:mb-4">
+            <h3 className="text-2xl font-black text-slate-950 print:text-base">طلاب متبقي لهم رصد (مادة فأكثر)</h3>
+            <span className="bg-amber-700 text-white px-5 py-2 rounded-2xl text-xs font-black print:bg-white print:text-amber-800 print:border print:border-amber-700">{lostStudents.length} طلاب</span>
           </div>
-          
-          <div className="space-y-5 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar">
-            {lostStudents.length === 0 ? (
-              <div className="text-center py-20 bg-slate-50 dark:bg-slate-800/50 rounded-[2.5rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
-                <p className="text-slate-700 font-bold text-xl">لا يوجد طلاب متأخرين حالياً ✨</p>
-              </div>
-            ) : (
-              lostStudents.map((s, i) => (
-                <div key={i} className="group p-7 bg-white dark:bg-slate-800/80 rounded-[2.5rem] border-2 border-slate-200 dark:border-slate-700 hover:border-amber-500 transition-all shadow-lg">
-                  <div className="flex justify-between items-start mb-5">
-                    <div>
-                      <h4 className="font-black text-xl text-slate-950 dark:text-white leading-tight">{s.name}</h4>
-                      <p className="text-sm text-slate-700 dark:text-slate-400 font-black mt-2 bg-slate-100 dark:bg-slate-900 inline-block px-3 py-1 rounded-lg">{s.saf} - فصل {s.fasel}</p>
-                    </div>
-                    <div className="bg-rose-700 text-white px-4 py-2 rounded-2xl text-xs font-black shadow-lg">
-                      {s.missingCount} مادة متبقية
-                    </div>
+          <div className="space-y-5 print:space-y-2">
+            {lostStudents.slice(0, 50).map((s, i) => (
+              <div key={i} className="p-7 bg-white rounded-[2.5rem] border-2 border-slate-200 print:p-2 print:rounded-xl print:border-slate-300 print-avoid-break">
+                <div className="flex justify-between items-start mb-3 print:mb-1">
+                  <div>
+                    <h4 className="font-black text-xl text-slate-950 print:text-xs leading-none">{s.name}</h4>
+                    <p className="text-xs text-slate-500 font-black mt-1 print:text-[8pt]">{s.saf} - فصل {s.fasel}</p>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {s.missingSubjects.map((sub, si) => (
-                      <span key={si} className="text-[10px] bg-slate-50 dark:bg-slate-700 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-950 dark:text-slate-200 font-black">
-                        {sub}
-                      </span>
-                    ))}
-                  </div>
+                  <div className="bg-rose-100 text-rose-700 px-3 py-1 rounded-xl text-[10px] font-black print:text-[7pt]">{s.missingCount} متبقية</div>
                 </div>
-              ))
-            )}
+                <div className="flex flex-wrap gap-2 no-print">
+                  {s.missingSubjects.map((sub, si) => <span key={si} className="text-[10px] bg-slate-50 px-2 py-1 rounded-lg border border-slate-200">{sub}</span>)}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
-        {/* أدوات المتابعة والتصدير */}
-        <div className="space-y-10">
+        {/* أدوات المتابعة - لا تظهر في الطباعة الورقية عادة أو تكون ثانوية */}
+        <div className="space-y-10 no-print">
           <section className="bg-slate-950 text-white p-12 rounded-[3.5rem] shadow-2xl relative overflow-hidden group border-2 border-slate-800">
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-600/10 rounded-full blur-[120px] -mr-40 -mt-40 group-hover:bg-emerald-600/20 transition-all duration-1000"></div>
-            <div className="relative z-10 flex flex-col items-center text-center space-y-10">
-              <div className="w-24 h-24 bg-emerald-700 text-white rounded-[2rem] flex items-center justify-center text-5xl shadow-2xl border-4 border-emerald-500/20">📑</div>
-              <div>
-                <h3 className="text-3xl font-black mb-4">تصدير التقرير الشامل</h3>
-                <p className="text-slate-400 text-lg font-bold leading-relaxed max-w-sm mx-auto">
-                  قم بتحميل ملف Excel احترافي يحتوي على جميع إحصائيات الرصد لجميع الفترات، بيانات المعلمين، وقوائم الطلاب للتوثيق الإداري.
-                </p>
-              </div>
-              <button 
-                onClick={exportFullExcel}
-                className="w-full py-6 bg-emerald-700 hover:bg-emerald-600 text-white rounded-3xl font-black text-2xl shadow-2xl shadow-emerald-950/50 hover:-translate-y-2 transition-all flex items-center justify-center gap-5 border border-emerald-400/20"
-              >
-                تصدير إكسل الشامل ➜
-              </button>
-            </div>
-          </section>
-
-          <section className="bg-blue-700 p-10 rounded-[3.5rem] shadow-2xl text-white relative overflow-hidden border-2 border-blue-600">
-            <div className="absolute top-0 left-0 w-full h-full bg-white/5 pointer-events-none"></div>
-            <h4 className="text-2xl font-black mb-6 flex items-center gap-5">
-              <span className="bg-white/20 p-3 rounded-2xl text-2xl">💡</span> تنبيه ذكي
-            </h4>
-            <div className="space-y-4 text-blue-50 text-base font-bold leading-relaxed">
-              <p>• التقرير أعلاه يعتمد كلياً على ملف المعلمين. في حال عدم رفعه، لن يظهر تقرير المقصرين.</p>
-              <p>• تأكد من تطابق أسماء المواد في ملف المعلمين مع ملفات نور لضمان دقة الربط.</p>
-              <p>• الفرز التلقائي يضع "المعلمين الأكثر تأخراً" في بداية القائمة لتسهيل عملية المتابعة الميدانية.</p>
-            </div>
+            <h3 className="text-3xl font-black mb-4">تصدير التقرير الشامل</h3>
+            <button onClick={exportFullExcel} className="w-full py-6 bg-emerald-700 hover:bg-emerald-600 text-white rounded-3xl font-black text-2xl transition-all">تصدير إكسل الشامل ➜</button>
           </section>
         </div>
       </div>
