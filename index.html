@@ -15,11 +15,11 @@
       }
       body {
         font-family: 'Cairo', sans-serif;
-        background-color: #f8fafc;
+        background-color: #f4f7fa;
         -webkit-font-smoothing: antialiased;
       }
 
-      /* فئات الألوان العامة للشاشة والطباعة */
+      /* الألوان العامة */
       .color-low { color: #b91c1c !important; }
       .color-mid { color: #1e40af !important; }
       .color-high { color: #15803d !important; }
@@ -38,44 +38,69 @@
       @media print {
         @page {
           size: A4 portrait;
-          margin: 10mm;
+          margin: 8mm;
         }
-        .no-print { display: none !important; }
-        body { background: white !important; padding: 0 !important; margin: 0 !important; }
         
-        /* ضمان ظهور الألوان في الطباعة */
-        .bg-low { background-color: #b91c1c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .bg-mid { background-color: #1e40af !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .bg-high { background-color: #15803d !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .no-print { display: none !important; }
+        
+        body { 
+          background: white !important; 
+          padding: 0 !important; 
+          margin: 0 !important; 
+          -webkit-print-color-adjust: exact !important; 
+          print-color-adjust: exact !important; 
+        }
 
-        /* التحكم في فواصل الصفحات */
-        .print-page { page-break-after: always !important; break-after: page !important; }
-        .print-avoid-break { page-break-inside: avoid !important; break-inside: avoid !important; }
-        .keep-together { page-break-inside: avoid !important; display: block; }
+        .keep-together {
+          break-inside: avoid-page !important;
+          page-break-inside: avoid !important;
+        }
+
+        thead {
+          display: table-header-group !important;
+        }
+        
+        tr {
+          page-break-inside: avoid !important;
+        }
 
         .print-card { 
-          border: 1.5pt solid #000 !important; 
-          border-radius: 10px !important;
+          border: 1px solid #000 !important; 
+          border-radius: 12px !important;
           margin-bottom: 20px !important;
           padding: 15px !important;
+          break-inside: avoid !important;
         }
 
         .print-compact-table { 
           width: 100% !important; 
           border-collapse: collapse !important; 
+          table-layout: auto !important;
         }
-        .print-compact-table th { 
-          background-color: #f1f5f9 !important; 
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-          border: 1pt solid #000 !important;
-          font-size: 10pt !important;
-          padding: 6px !important;
-        }
+        
+        .print-compact-table th, 
         .print-compact-table td { 
-          border: 1pt solid #000 !important;
-          font-size: 9pt !important;
+          border: 0.5px solid #000 !important;
           padding: 4px !important;
+          word-break: break-all !important;
+        }
+
+        .print-compact-table th {
+          background-color: #f8fafc !important;
+          font-weight: 800 !important;
+          font-size: 8pt !important;
+        }
+        
+        .print-compact-table td {
+          font-size: 7.5pt !important;
+        }
+        
+        .bg-low { background-color: #ef4444 !important; }
+        .bg-mid { background-color: #3b82f6 !important; }
+        .bg-high { background-color: #10b981 !important; }
+        
+        .progress-container {
+          border: 1px solid #000 !important;
         }
       }
     </style>
