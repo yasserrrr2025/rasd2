@@ -10,41 +10,32 @@
     <style>
       body {
         font-family: 'Cairo', sans-serif;
+        background-color: #f8fafc;
       }
       @media print {
         .no-print { display: none !important; }
-        .print-avoid-break { 
-          break-inside: avoid !important; 
-          page-break-inside: avoid !important; 
-        }
-        .print-header-stay { 
-          break-after: avoid !important; 
-          page-break-after: avoid !important; 
-        }
+        body { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
         .print-card { 
-          border: 1px solid #e2e8f0; 
+          border: 1px solid #e2e8f0 !important; 
+          box-shadow: none !important; 
+          background: white !important; 
+          margin-bottom: 8px !important;
+          border-radius: 4px !important;
           break-inside: avoid;
-          margin-bottom: 1rem !important;
         }
-        body { 
-          background-color: white !important; 
-          padding: 0 !important;
-          margin: 0 !important;
+        .print-compact-table td, .print-compact-table th { 
+          padding: 3px 5px !important; 
+          font-size: 8.5pt !important;
+          border: 0.5pt solid #cbd5e1 !important;
+          line-height: 1.2 !important;
         }
-        main {
-          max-width: 100% !important;
-          padding: 0 !important;
-        }
-        /* تصغير المسافات للطباعة لتوفير الورق */
-        .space-y-16 > * + * { margin-top: 1.5rem !important; }
-        .space-y-12 > * + * { margin-top: 1rem !important; }
-        .p-8, .p-10, .p-14 { padding: 1.5rem !important; }
-        .rounded-[2.5rem], .rounded-[3rem], .rounded-[3.5rem] { border-radius: 1rem !important; }
-        
-        * { 
-          -webkit-print-color-adjust: exact !important; 
-          print-color-adjust: exact !important; 
-        }
+        .print-text-small { font-size: 7.5pt !important; }
+        h1, h2, h3 { color: black !important; margin: 5px 0 !important; }
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(226, 232, 240, 0.8);
       }
     </style>
   <script type="importmap">
@@ -63,7 +54,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-slate-50 text-slate-900">
+  <body class="text-slate-900">
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>

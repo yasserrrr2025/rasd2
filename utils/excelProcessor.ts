@@ -17,16 +17,10 @@ export const processRasedFile = async (file: File): Promise<{ saf: string; fasel
         const sheet = wb.Sheets[wb.SheetNames[0]];
         const jsonData: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
         
-        /**
-         * تحديث مواقع البيانات بناءً على توجيه المستخدم:
-         * الصف في الخلية A7 (المؤشر [6][0])
-         * الفصل في الخلية A14 (المؤشر [13][0])
-         * الخلايا مدموجة، لذا القيمة ستكون في الخلية الأولى من الدمج.
-         */
-        let safRaw = jsonData[6]?.[0] || "غير معروف";
-        let faselRaw = jsonData[13]?.[0] || "غير معروف";
+        // الأولوية لـ A7 و A14 للملفات الرسمية، ثم البحث البديل للملفات الأخرى
+        let safRaw = jsonData[6]?.[0] || jsonData[2]?.[1] || "غير معروف";
+        let faselRaw = jsonData[13]?.[0] || jsonData[8]?.[1] || "غير معروف";
         
-        // تنظيف النصوص من المسميات الزائدة إذا وجدت داخل الخلية
         let saf = normalizeString(safRaw).replace(/الصف\s*:?/g, "").trim();
         let fasel = normalizeString(faselRaw).replace(/الفصل\s*:?/g, "").trim();
         
@@ -40,73 +34,73 @@ export const processRasedFile = async (file: File): Promise<{ saf: string; fasel
 };
 
 export const extractSummaryData = (data: any[][], currentSummary: RasedSummary): RasedSummary => {
-  if (data.length < 15) return currentSummary;
+  if (data.length < 8) return currentSummary;
 
-  // البحث عن صف العناوين (المواد الدراسية)
-  let headersIdx = 10;
-  for (let i = 8; i < 25; i++) {
-    if (data[i]?.some(cell => {
+  let headersIdx = -1;
+  let periodIdx = -1;
+  let nameIdx = -1;
+
+  // مسح ديناميكي شامل للبحث عن العناوين في أول 35 صف
+  for (let i = 0; i < Math.min(data.length, 35); i++) {
+    const row = data[i] || [];
+    const pIdx = row.findIndex(cell => {
       const s = normalizeString(cell);
-      return s.includes("الفترة") || s.includes("الطالب") || s.includes("الاسم");
-    })) {
+      return s.includes("الفترة") || s === "أولى" || s === "ثانية";
+    });
+    
+    if (pIdx !== -1) {
       headersIdx = i;
+      periodIdx = pIdx;
+      // البحث عن عمود الاسم بجانب الفترة أو البحث عن كلمة "طالب"
+      nameIdx = row.findIndex(cell => {
+        const s = normalizeString(cell);
+        return s.includes("اسم") || s.includes("الطالب");
+      });
+      if (nameIdx === -1) nameIdx = periodIdx + 1; 
       break;
     }
   }
 
-  const headers = data[headersIdx];
+  if (periodIdx === -1) return currentSummary;
+
+  const headers = data[headersIdx] || [];
   const rows = data.slice(headersIdx + 1);
 
-  // تحديد مواقع الأعمدة الأساسية
-  let periodIdx = headers.findIndex(h => normalizeString(h).includes("الفترة"));
-  let nameIdx = headers.findIndex(h => normalizeString(h).includes("الطالب") || normalizeString(h).includes("الاسم"));
-
-  if (periodIdx === -1 || nameIdx === -1) return currentSummary;
-
-  // استخراج الصف والفصل من المواقع المحددة (A7 و A14)
-  const saf = normalizeString(data[6]?.[0]).replace(/الصف\s*:?/g, "").trim();
-  const fasel = normalizeString(data[13]?.[0]).replace(/الفصل\s*:?/g, "").trim();
+  const saf = normalizeString(data[6]?.[0] || data[2]?.[1]).replace(/الصف\s*:?/g, "").trim();
+  const fasel = normalizeString(data[13]?.[0] || data[8]?.[1]).replace(/الفصل\s*:?/g, "").trim();
 
   if (!currentSummary[saf]) currentSummary[saf] = {};
   if (!currentSummary[saf][fasel]) currentSummary[saf][fasel] = {};
 
-  const excluded = ["م", "السلوك", "المواظبة", "الاسم", "الطالب", "الفترة", "رقم الهوية"];
-  let currentStudentName = "";
+  const excludedKeywords = ["م", "السلوك", "المواظبة", "الاسم", "الطالب", "الفترة", "رقم الهوية", "السجل", "رقم"];
+  let lastValidName = "";
 
   rows.forEach(row => {
-    let nameVal = normalizeString(row[nameIdx]);
-    
-    if (nameVal) {
-      // إزالة رقم الهوية وأي أرقام طويلة (بما في ذلك السالبة) نهائياً
-      // النمط يعالج "رقم الهوية: -2299094157" أو الأرقام الطويلة المجردة
-      nameVal = nameVal.replace(/رقم\s*الهوية\s*:?\s*-?\d+/g, "");
-      nameVal = nameVal.replace(/-?\d{8,}/g, ""); // حذف أي تسلسل رقمي طويل (8 أرقام فأكثر)
-      nameVal = nameVal.replace(/الاسم\s*:?/g, "");
-      nameVal = nameVal.trim();
-
-      if (nameVal !== "" && nameVal.length > 3) {
-        currentStudentName = nameVal;
-      }
+    // استخراج الاسم كاملاً مع تنظيف السجل المدني فقط
+    let rawName = normalizeString(row[nameIdx]);
+    if (rawName) {
+      // حذف السجل المدني المكون من 10 أرقام وما شابه، مع الحفاظ على باقي النص (الاسم)
+      rawName = rawName.replace(/رقم\s*الهوية\s*:?\s*-?\d+/g, "");
+      rawName = rawName.replace(/-?\d{9,}/g, ""); 
+      rawName = rawName.replace(/الاسم\s*:?/g, "").trim();
+      
+      if (rawName.length > 3) lastValidName = rawName;
     }
 
-    let periodValRaw = normalizeString(row[periodIdx]);
-    let periodVal = "";
-    
-    if (periodValRaw.includes("أولى")) periodVal = "أولى";
-    else if (periodValRaw.includes("ثانية")) periodVal = "ثانية";
+    let pRaw = normalizeString(row[periodIdx]);
+    let pVal = pRaw.includes("أولى") ? "أولى" : pRaw.includes("ثانية") ? "ثانية" : "";
 
-    if (!periodVal || !currentStudentName) return;
+    if (!pVal || !lastValidName) return;
 
-    if (!currentSummary[saf][fasel][periodVal]) {
-      currentSummary[saf][fasel][periodVal] = {};
-    }
+    if (!currentSummary[saf][fasel][pVal]) currentSummary[saf][fasel][pVal] = {};
 
     headers.forEach((subj, sIdx) => {
-      const subjectName = normalizeString(subj);
-      if (!subjectName || excluded.some(ex => subjectName.includes(ex))) return;
+      const subName = normalizeString(subj);
+      if (!subName || excludedKeywords.some(ex => subName.includes(ex))) return;
+      if (sIdx === nameIdx || sIdx === periodIdx) return;
 
-      if (!currentSummary[saf][fasel][periodVal][subjectName]) {
-        currentSummary[saf][fasel][periodVal][subjectName] = {
+      if (!currentSummary[saf][fasel][pVal][subName]) {
+        currentSummary[saf][fasel][pVal][subName] = {
           rasidCount: 0,
           lamRasidCount: 0,
           percentage: 0,
@@ -116,28 +110,23 @@ export const extractSummaryData = (data: any[][], currentSummary: RasedSummary):
       }
 
       const val = row[sIdx];
-      // المنطق المعتمد: 0 = تم الرصد، 1 = لم يتم الرصد
+      // 0 = تم الرصد، 1 = متبقي
       const isRasid = (val === 0 || val === "0");
       const isLamRasid = (val === 1 || val === "1");
 
       if (isRasid || isLamRasid) {
-        const subData = currentSummary[saf][fasel][periodVal][subjectName];
-        if (!subData.studentsList.includes(currentStudentName)) {
-          subData.studentsList.push(currentStudentName);
+        const subData = currentSummary[saf][fasel][pVal][subName];
+        if (!subData.studentsList.includes(lastValidName)) {
+          subData.studentsList.push(lastValidName);
         }
-        
-        subData.studentRasidStatus[currentStudentName] = isRasid;
-        
-        if (isRasid) {
-          subData.rasidCount++;
-        } else {
-          subData.lamRasidCount++;
-        }
+        subData.studentRasidStatus[lastValidName] = isRasid;
+        if (isRasid) subData.rasidCount++;
+        else subData.lamRasidCount++;
       }
     });
   });
 
-  // تحديث الحسابات النهائية للنسب المئوية
+  // حساب النسب المئوية
   for (const p in currentSummary[saf][fasel]) {
     for (const s in currentSummary[saf][fasel][p]) {
       const d = currentSummary[saf][fasel][p][s];
