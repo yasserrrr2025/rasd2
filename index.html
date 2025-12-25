@@ -16,67 +16,52 @@
       body {
         font-family: 'Cairo', sans-serif;
         background-color: #f8fafc;
+        scroll-behavior: smooth;
         -webkit-font-smoothing: antialiased;
       }
-
-      /* فئات الألوان العامة للشاشة والطباعة */
-      .color-low { color: #b91c1c !important; }
-      .color-mid { color: #1e40af !important; }
-      .color-high { color: #15803d !important; }
-      
-      .bg-low { background-color: #ef4444 !important; } 
-      .bg-mid { background-color: #3b82f6 !important; } 
-      .bg-high { background-color: #10b981 !important; } 
-
-      .progress-container {
-        height: 12px;
-        background-color: #e2e8f0;
-        border-radius: 999px;
-        overflow: hidden;
-      }
-
       @media print {
         @page {
           size: A4 portrait;
-          margin: 10mm;
+          margin: 10mm 10mm;
         }
         .no-print { display: none !important; }
-        body { background: white !important; padding: 0 !important; margin: 0 !important; }
+        body { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
         
-        /* ضمان ظهور الألوان في الطباعة */
-        .bg-low { background-color: #b91c1c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .bg-mid { background-color: #1e40af !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .bg-high { background-color: #15803d !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-
-        /* التحكم في فواصل الصفحات */
-        .print-page { page-break-after: always !important; break-after: page !important; }
-        .print-avoid-break { page-break-inside: avoid !important; break-inside: avoid !important; }
-        .keep-together { page-break-inside: avoid !important; display: block; }
+        .print-page-break { page-break-before: always; break-before: page; }
+        .print-avoid-break { page-break-inside: avoid; break-inside: avoid; }
 
         .print-card { 
-          border: 1.5pt solid #000 !important; 
-          border-radius: 10px !important;
-          margin-bottom: 20px !important;
-          padding: 15px !important;
+          border: 1.2pt solid #000 !important; 
+          border-radius: 8px !important;
+          margin-bottom: 15px !important;
+          page-break-inside: avoid;
         }
 
-        .print-compact-table { 
-          width: 100% !important; 
-          border-collapse: collapse !important; 
-        }
+        .print-compact-table thead { display: table-header-group !important; }
         .print-compact-table th { 
           background-color: #f1f5f9 !important; 
+          color: black !important;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
           border: 1pt solid #000 !important;
-          font-size: 10pt !important;
-          padding: 6px !important;
-        }
-        .print-compact-table td { 
-          border: 1pt solid #000 !important;
-          font-size: 9pt !important;
+          font-size: 8pt !important;
           padding: 4px !important;
         }
+        .print-compact-table td { 
+          border: 0.8pt solid #000 !important;
+          font-size: 8pt !important;
+          color: black !important;
+          padding: 3px !important;
+        }
+        
+        /* ألوان صريحة للطباعة */
+        .color-low { color: #b91c1c !important; font-weight: 900 !important; -webkit-print-color-adjust: exact; }
+        .color-mid { color: #1e40af !important; font-weight: 900 !important; -webkit-print-color-adjust: exact; }
+        .color-high { color: #15803d !important; font-weight: 900 !important; -webkit-print-color-adjust: exact; }
+        
+        .bg-low { background-color: #b91c1c !important; -webkit-print-color-adjust: exact; }
+        .bg-mid { background-color: #1e40af !important; -webkit-print-color-adjust: exact; }
+        .bg-high { background-color: #15803d !important; -webkit-print-color-adjust: exact; }
       }
     </style>
   <script type="importmap">

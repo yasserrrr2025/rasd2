@@ -57,8 +57,8 @@ const TrackingTables: React.FC<TrackingTablesProps> = ({ rasedSummary, period })
       <div className="no-print bg-slate-900 text-white p-6 rounded-3xl shadow-lg flex items-center gap-4">
         <div className="bg-blue-600 p-3 rounded-2xl">🖨️</div>
         <div>
-          <h4 className="font-black text-sm">كشوف متابعة الرصد الميداني</h4>
-          <p className="text-slate-400 text-xs font-bold mt-1">استخدم هذه الكشوف لمتابعة الرصد الورقي أو الميداني.</p>
+          <h4 className="font-black text-sm">كشوف متابعة الرصد جاهزة للطباعة</h4>
+          <p className="text-slate-400 text-xs font-bold mt-1">تم تنسيق الجداول لتناسب مقاس الورق A4 مع وضوح الرموز.</p>
         </div>
       </div>
       
